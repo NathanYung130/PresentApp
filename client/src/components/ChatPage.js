@@ -4,37 +4,46 @@ import ChatBody from './ChatBody';
 import ChatFooter from './ChatFooter';
 
 const ChatPage = ({ socket }) => {
-  const [messages, setMessages] = useState([]);
-  const [typingStatus, setTypingStatus] = useState('');
-  const lastMessageRef = useRef(null);
+    const [messages, setMessages] = useState([]);
+    const [typingStatus, setTypingStatus] = useState('');
+    const lastMessageRef = useRef(null);
 
-  useEffect(() => {
-    socket.on('messageResponse', (data) => setMessages([...messages, data]));
-  }, [socket, messages]);
+    useEffect(() => {
+        const handleMessageResponse = (data) => {
+            setMessages((prevMessages) => [...prevMessages, data]);
+        };
 
-  useEffect(() => {
-    // 👇️ scroll to bottom every time messages change
-    lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+        const handleTypingResponse = (data) => {
+            setTypingStatus(data);
+        };
 
-  useEffect(() => {
-    socket.on('typingResponse', (data) => setTypingStatus(data));
-  }, [socket]);
+        socket.on('messageResponse', handleMessageResponse);
+        socket.on('typingResponse', handleTypingResponse);
 
+        // Cleanup listeners when component unmounts
+        return () => {
+            socket.off('messageResponse', handleMessageResponse);
+            socket.off('typingResponse', handleTypingResponse);
+        };
+    }, [socket]); // Reintroduce the `socket` dependency
 
-  return (
-    <div className="chat">
-      <ChatBar socket={socket} />
-      <div className="chat__main">
-        <ChatBody
-          messages={messages}
-          typingStatus={typingStatus}
-          lastMessageRef={lastMessageRef}
-        />
-        <ChatFooter socket={socket} />
-      </div>
-    </div>
-  );
+    useEffect(() => {
+        lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+    return (
+        <div className="chat">
+            <ChatBar socket={socket} />
+            <div className="chat__main">
+                <ChatBody
+                    messages={messages}
+                    typingStatus={typingStatus}
+                    lastMessageRef={lastMessageRef}
+                />
+                <ChatFooter socket={socket} />
+            </div>
+        </div>
+    );
 };
 
 export default ChatPage;

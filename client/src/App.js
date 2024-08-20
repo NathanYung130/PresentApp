@@ -5,16 +5,16 @@ import socketIO from 'socket.io-client';
 
 const socket = socketIO.connect('http://localhost:4000');
 function App() {
-  return (
-    <BrowserRouter>
-      <div>
-        <Routes>
-          <Route path="/" element={<Home socket={socket} />}></Route>
-          <Route path="/chat" element={<ChatPage socket={socket} />}></Route>
-        </Routes>
-      </div>
-    </BrowserRouter>
-  );
+    return (
+        <BrowserRouter>
+            <div>
+                <Routes>
+                    <Route path="/" element={<Home socket={socket} />} />
+                    <Route path="/chat/:roomCode" element={<ChatPage socket={socket} />} />
+                </Routes>
+            </div>
+        </BrowserRouter>
+    );
 }
 
 export default App;
