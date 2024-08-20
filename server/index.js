@@ -23,7 +23,7 @@ socketIO.on('connection', (socket) => {
 
     socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data));
 
-    //Listens when a new user joins the server
+    //Listens when a new  user joins the server
   socket.on('newUser', (data) => {
     //Adds the new user to the list of users
     users.push(data);
