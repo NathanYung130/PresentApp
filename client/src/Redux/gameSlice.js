@@ -14,10 +14,6 @@ const gameSlice = createSlice({
     },
     resetGame: (state, action) => {
       return { ...state, gameStarted: false}
-      /*
-      state.gameStarted = false;
-      state.gameData = null;
-      */
     },
   },
 });

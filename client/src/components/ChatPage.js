@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import ChatBar from './ChatBar';
 import ChatBody from './ChatBody';
 import ChatFooter from './ChatFooter';
-import GameDisplay from './GameDisplay';
+import GameDisplay from './gameHandlers/GameDisplay';
 
 const ChatPage = ({ socket }) => {
     const [messages, setMessages] = useState([]);
