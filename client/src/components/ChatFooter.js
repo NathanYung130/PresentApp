@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
 
 const ChatFooter = ({ socket }) => {
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = React.useState('');
+  const roomCode = localStorage.getItem('roomCode');
+  const currentUserName = localStorage.getItem('userName');
 
   const handleTyping = () =>
-    socket.emit('typing', `${localStorage.getItem('userName')} is typing`);
+    socket.emit('typing', `${currentUserName} is typing`);
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (message.trim() && localStorage.getItem('userName')) {
+    if (message.trim() && currentUserName) {
       socket.emit('message', {
         text: message,
-        name: localStorage.getItem('userName'),
-        id: `${socket.id}${Math.random()}`,
+        name: currentUserName,
+        roomCode: roomCode, // Send the room code along with the message
         socketID: socket.id,
       });
     }

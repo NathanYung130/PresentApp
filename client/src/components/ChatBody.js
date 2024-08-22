@@ -1,13 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
 
 const ChatBody = ({ messages, lastMessageRef, socket }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    //const roomId = useSelector((state) => state.room.roomId);
+    const roomId = useSelector((state) => state.room.roomId);
 
     const handleLeaveChat = () => {
         //update Redux store with roomId
@@ -22,7 +22,7 @@ const ChatBody = ({ messages, lastMessageRef, socket }) => {
 
     const handleGameStart = () => {
     // Emit 'startGame' message to Socket.IO
-    socket.emit('startGame', { /* data to be sent (optional) */ }); // Replace with relevant data if needed
+    socket.emit('startGame'); // Replace with relevant data if needed
     };
 
     return (
