@@ -10,7 +10,7 @@ const GameDisplay = ({ socket }) => {
         // Listen for the 'gameStarted' event from the server
         socket.on('gameStarted', () => {
             console.log('Game has started!'); 
-            dispatch(startGame);
+            dispatch(startGame());
         });
 
         // Cleanup event listener when the component unmounts
