@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+
+import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
 
 const Home = ({ socket }) => {
     const navigate = useNavigate();
+    const dispatch = useDispatch(); // Import useDispatch from 'react-redux'
+
     const [userName, setUserName] = useState('');
     const [roomCode, setRoomCode] = useState('');
 
@@ -10,6 +15,11 @@ const Home = ({ socket }) => {
         e.preventDefault();
         localStorage.setItem('userName', userName);
         localStorage.setItem('roomCode', roomCode);
+
+        //Update Redux store with roomCode via dispatch action
+        dispatch(setUser(userName));
+        dispatch(setRoomId(roomCode));
+        dispatch(setSocketId(socket.id));
 
         // Send the username and room code to the Node.js server
         socket.emit('joinRoom', { userName, roomCode, socketID: socket.id });

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import ChatBar from './ChatBar';
 import ChatBody from './ChatBody';
 import ChatFooter from './ChatFooter';
+import GameDisplay from './GameDisplay';
 
 const ChatPage = ({ socket }) => {
     const [messages, setMessages] = useState([]);
@@ -32,15 +33,19 @@ const ChatPage = ({ socket }) => {
     }, [messages]);
 
     return (
-        <div className="chat">
-            <ChatBar socket={socket} />
-            <div className="chat__main">
-                <ChatBody
-                    messages={messages}
-                    typingStatus={typingStatus}
-                    lastMessageRef={lastMessageRef}
-                />
-                <ChatFooter socket={socket} />
+        <div className = "window">
+            <div className="chat">
+                <ChatBar socket={socket} />
+                <div className="chat__main">
+                    <GameDisplay socket={socket}/>
+                    <ChatBody
+                        messages={messages}
+                        typingStatus={typingStatus}
+                        lastMessageRef={lastMessageRef}
+                        socket={socket}
+                    />
+                    <ChatFooter socket={socket} />
+                </div>
             </div>
         </div>
     );
