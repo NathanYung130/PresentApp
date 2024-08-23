@@ -1,0 +1,38 @@
+.chat__footer {
+    display: flex;
+    padding: 10px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+    position: fixed; /* This makes the footer fixed on the screen */
+    bottom: 0; /* Aligns it at the bottom of the screen */
+    right: 0; /* Start from the left edge */
+    width: 15%; /* Take full width of the screen */
+    z-index: 1000; /* Ensures it stays above other components */
+}
+
+.form {
+    display: flex;
+    width: 100%;
+}
+
+.message {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #c4c3c3;
+    font-size: 12px;
+}
+
+.sendBtn {
+    padding: 10px 15px;
+    margin-left: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.sendBtn:hover {
+    background-color: #45a049;
+}

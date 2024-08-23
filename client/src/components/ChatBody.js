@@ -2,7 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
+
 import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
+
+import styles from './styles/ChatBody.css'
 
 const ChatBody = ({ messages, lastMessageRef, socket }) => {
     const navigate = useNavigate();
@@ -20,21 +23,8 @@ const ChatBody = ({ messages, lastMessageRef, socket }) => {
         window.location.reload();
     };
 
-    const handleGameStart = () => {
-    // Emit 'startGame' message to Socket.IO
-    socket.emit('startGame'); // Replace with relevant data if needed
-    };
-
     return (
-        <>
-            <header className="chat__mainHeader">
-                <p>Joe Box!</p>
-                <button className="gameStart_btn" onClick={handleGameStart}>START GAME</button>
-                <button className="leaveChat__btn" onClick={handleLeaveChat}>
-                    LEAVE CHAT
-                </button>
-            </header>
-
+        <>      
             <div className="message__container">
                 {messages.map((message) => {
                     const isCurrentUser = message.name === localStorage.getItem('userName');
@@ -53,6 +43,7 @@ const ChatBody = ({ messages, lastMessageRef, socket }) => {
                 </div> */}
                 <div ref={lastMessageRef} />
             </div>
+
         </>
     );
 };
