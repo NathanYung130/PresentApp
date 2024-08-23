@@ -16,6 +16,7 @@ const socketIO = require("socket.io")(http, {
 const supabase = require('./supabaseClient');
 
 app.use(cors());
+const gameStates = ['answerInitialQuestion', 'othersAnswering', 'voting', 'leaderboard'];
 
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
@@ -44,13 +45,8 @@ socketIO.on('connection', (socket) => {
             console.error('Error handling joinRoom:', error.message);
         }
     
-    socket.on('startGame', () => {
-        //console.log('Game started in room: ', roomCode);
-        //Broadcast to all users that game has started
-        socketIO.to(roomCode).emit('gameStarted');
-    })
-    });
-    /*
+
+     /*
     //=============== GAME START HANDLER ==================
     //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
     //Game start notifier, activated when user clicks "Start Game"
@@ -61,29 +57,133 @@ socketIO.on('connection', (socket) => {
         socketIO.to(roomCode).emit('gameStarted', roomCode);
         })
     */
+    //USER STARTS GAME: this one is to emit
+    socket.on('startGame', () => {
+        //console.log('Game started in room: ', roomCode);
+        //Broadcast to all users that game has started
+        socketIO.to(roomCode).emit('gameStarted');
+    })
 
-    socket.on('message', async (data) => {
+    socket.on('startGame', async () => {
         try {
-            console.log('Received message data:', data);
+            // Fetch all users in the current room from the database
+            const { data: users, error: fetchError } = await supabase
+                .from('room_users')
+                .select('username')
+                .eq('roomcode', socket.roomCode);
 
-            // Ensure all necessary fields are present
-            if (!data.text || !data.name || !data.socketID) {
-                throw new Error('Missing data fields');
-            }
-            console.log('Text:', data.text);
-            console.log('id:', data.id);
-            console.log('Name:', data.name);
-            console.log('Socket ID:', data.socketID);
-            console.log('Romm code actual: ', data.roomCode)
+            if (fetchError) throw fetchError;
+            
+            // Extract usernames and shuffle the player order randoml
+            const players = users.map(user => user.username);
+            const shuffledPlayers = players.sort(() => 0.5 - Math.random());
 
-            // Store message in Supabase
-            const { error } = await supabase
-                .from('messages')
-                .insert([{ text: data.text, name: data.name, roomcode: data.roomCode, socketid: data.socketID }]);
+            // Insert a new game session into the database
+            const { error: insertError } = await supabase.from('game_sessions').insert({
+                room_code: socket.roomCode,
+                current_question: 0,
+                current_answerer: null,
+                game_stage: 'answerInitialQuestion',// Set initial game state
+                players: shuffledPlayers,
+                answered_players: [],
+                sitting_out_player: null,
+                players_who_sat_out: []
+            });
+
+            if (insertError) throw insertError;
+
+            // Notify all clients in the room that the game has started
+            socketIO.to(socket.roomCode).emit('gameStateChange', { 
+                state: 'answerInitialQuestion', 
+                message: 'Answer question 1' 
+            });
+        } catch (error) {
+            console.error('Error starting game:', error.message);
+        }
+    });
+
+    // Handler for advancing to the next game state
+    socket.on('nextGameState', async () => {
+        try {
+            // Fetch the current game session data from the database
+            const { data, error } = await supabase
+                .from('game_sessions')
+                .select('*')
+                .eq('room_code', socket.roomCode)
+                .single();
 
             if (error) throw error;
 
-            socketIO.to(data.roomCode).emit('messageResponse', data);
+            // Initialize variables for the next state
+            let nextState;
+            let sittingOutPlayer = data.sitting_out_player;
+            let answeredPlayers = data.answered_players || [];
+            let playersWhoSatOut = data.players_who_sat_out || [];
+            let currentStateIndex = gameStates.indexOf(data.game_stage);
+
+            // Determine the next game state
+            if (currentStateIndex === -1 || currentStateIndex === gameStates.length - 1) {
+                nextState = gameStates[0];
+            } else {
+                nextState = gameStates[currentStateIndex + 1];
+            }
+
+            if (nextState === 'othersAnswering') {
+                const availablePlayers = data.players.filter(player => !playersWhoSatOut.includes(player));
+                
+                if (availablePlayers.length === 0) {
+                    // If all players have sat out, move to leaderboard
+                    nextState = 'leaderboard';
+                } else {
+                    // Choose a new player to sit out
+                    sittingOutPlayer = availablePlayers[0];
+                    playersWhoSatOut.push(sittingOutPlayer);
+                    answeredPlayers = [sittingOutPlayer];
+                }
+            }
+            // Update the game session in the database
+            await supabase
+                .from('game_sessions')
+                .update({
+                    game_stage: nextState,
+                    sitting_out_player: sittingOutPlayer,
+                    answered_players: answeredPlayers,
+                    players_who_sat_out: playersWhoSatOut
+                })
+                .eq('room_code', socket.roomCode);
+            // Notify all clients in the room about the new game state
+            socketIO.to(socket.roomCode).emit('gameStateChange', { state: nextState, sittingOutPlayer });
+        } catch (error) {
+            console.error('Error changing game state:', error.message);
+        }
+    });
+
+
+});
+   
+// SENDING MESSAGES//
+socket.on('message', async (data) => {
+  try {
+      console.log('Received message data:', data);
+
+      // Ensure all necessary fields are present
+      if (!data.text || !data.name || !data.socketID) {
+          throw new Error('Missing data fields');
+      }
+
+      // Store message in Supabase
+      const { error } = await supabase
+          .from('messages')
+          .insert([{ text: data.text, name: data.name, roomcode: data.roomCode, socketid: data.socketID }]);
+
+      if (error) throw error;
+
+      // Emit the message to all clients in the room
+      socketIO.to(data.roomCode).emit('messageResponse', {
+          text: data.text,
+          name: data.name,
+          socketID: data.socketID
+      });
         } catch (error) {
             console.error('Error handling message:', error.message);
         }

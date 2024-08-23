@@ -1,24 +1,19 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { startGame } from '../../Redux/gameSlice';
-import  GameLobby  from './GameLobby';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import GameLobby from './GameLobby';
 import FibbageHandler from './fibbageHandler';
-
-
 
 const GameDisplay = ({ socket }) => {
     const gameStart = useSelector((state) => state.game.gameStarted);
     console.log('gameStart; ', gameStart);
     return(
-        <> 
-        <div className = "lobby">
+        <div className="lobby">
             {gameStart ? (
-                <FibbageHandler socket = {socket}/>
+                <FibbageHandler socket={socket} />
             ) : (
-                <GameLobby socket = {socket}/>
+                <GameLobby socket={socket} />
             )}
         </div>
-        </>
     );
 };
 

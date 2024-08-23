@@ -3,6 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   gameStarted: false,
   gameData: null,
+  sittingOutPlayer: null,
+  playersWhoSatOut: [],
 };
 
 const gameSlice = createSlice({
@@ -19,8 +21,16 @@ const gameSlice = createSlice({
       state.gameData = null;
       */
     },
+    setGameState: (state, action) => {
+      state.gameState = action.payload.state;
+      state.sittingOutPlayer = action.payload.sittingOutPlayer;
+    },
+    updatePlayersWhoSatOut: (state, action) => {
+      state.playersWhoSatOut = action.payload;
+    },
   },
 });
 
-export const { startGame, resetGame } = gameSlice.actions;
+export const { startGame, resetGame, setGameState, updatePlayersWhoSatOut } = gameSlice.actions;
 export default gameSlice.reducer;
+
