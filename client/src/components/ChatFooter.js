@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const ChatFooter = ({ socket }) => {
   const [message, setMessage] = React.useState('');
   const roomCode = localStorage.getItem('roomCode');
-  const currentUserName = localStorage.getItem('userName');
+  //const currentUserName = localStorage.getItem('userName');
+  const currentUserName = useSelector((state) => state.room.userName);
 
   const handleTyping = () =>
     socket.emit('typing', `${currentUserName} is typing`);
 
   const handleSendMessage = (e) => {
+    console.log('current user: ',currentUserName)
     e.preventDefault();
     if (message.trim() && currentUserName) {
       socket.emit('message', {
