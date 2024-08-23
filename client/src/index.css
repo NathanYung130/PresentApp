@@ -1,3 +1,4 @@
+/*
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 * {
@@ -102,8 +103,8 @@
   width: 77%;
   background-color: #fff;
   overflow-y: scroll;
-  height: 400px; /* Adjust the height as needed */
-  /* Add these properties */
+  height: 400px;
+
   bottom: 10vh;
   right: 0;
   position: fixed;
@@ -173,3 +174,5 @@
   font-size: 13px;
   font-style: italic;
 }
+
+*/

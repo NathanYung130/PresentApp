@@ -4,6 +4,8 @@ import { useDispatch } from 'react-redux';
 
 import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
 
+import styles from './styles/Home.css'
+
 const Home = ({ socket }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch(); // Import useDispatch from 'react-redux'
@@ -27,8 +29,10 @@ const Home = ({ socket }) => {
     };
 
     return (
+        <>
+        <h1 className = "Title">Joe-Box</h1>
         <form className="home__container" onSubmit={handleSubmit}>
-            <h2 className="home__header">Sign in to Open Chat</h2>
+            <h2 className="home__header">Enter User and  Room Code</h2>
             <label htmlFor="username">Username</label>
             <input
                 type="text"
@@ -50,6 +54,7 @@ const Home = ({ socket }) => {
             />
             <button className="home__cta">JOIN ROOM</button>
         </form>
+        </>
     );
 };
 

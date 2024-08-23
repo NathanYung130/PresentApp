@@ -5,6 +5,8 @@ import ChatFooter from './ChatFooter';
 import GameDisplay from './gameHandlers/GameDisplay';
 import supabase from '../supabaseClient';
 
+import styles from './styles/ChatPage.css';
+
 const ChatPage = ({ socket }) => {
     const [messages, setMessages] = useState([]);
     const [typingStatus, setTypingStatus] = useState('');
@@ -63,11 +65,16 @@ const ChatPage = ({ socket }) => {
     };
 
     return (
+        <>
+        <div className="logo">
+            <h1>Joe Box</h1>
+        </div>
         <div className = "window">
-            <div className="chat">
                 <ChatBar socket={socket} />
-                <div className="chat__main">
+                <div className = "gameDisp">
                     <GameDisplay socket={socket}/>
+                </div>
+                <div className="chat__main">
                     <ChatBody
                         socket={socket}
                         messages={messages}
@@ -80,10 +87,11 @@ const ChatPage = ({ socket }) => {
                     newMessage={newMessage}
                     setNewMessage={setNewMessage}
                     handleSendMessage={handleSendMessage}
-                />
-                </div>
+                    />
             </div>
         </div>
+    
+    </>
     );
 };
 

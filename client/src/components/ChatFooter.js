@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+import styles from './styles/ChatFooter.css'
 const ChatFooter = ({ socket }) => {
   const [message, setMessage] = React.useState('');
   const roomCode = localStorage.getItem('roomCode');
