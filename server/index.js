@@ -102,7 +102,7 @@ socketIO.on('connection', (socket) => {
         }
     });
 
-    // Handler for advancing to the next game state
+    // the Handler for advancing to the next game state
     socket.on('nextGameState', async () => {
         try {
             // Fetch the current game session data from the database
