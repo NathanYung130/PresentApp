@@ -197,41 +197,52 @@ socket.on('message', async (data) => {
 });
 
 socket.on('disconnect', async () => {
-        try {
-            const roomCode = socket.roomCode;
-            console.log('User disconnected:', socket.id);
+  try {
+      const roomCode = socket.roomCode;
+      console.log('User disconnected:', socket.id);
 
-            const { error: deleteUserError } = await supabase
-                .from('room_users')
-                .delete()
-                .eq('socketid', socket.id);
+      const { error: deleteUserError } = await supabase
+          .from('room_users')
+          .delete()
+          .eq('socketid', socket.id);
 
-            if (deleteUserError) throw deleteUserError;
+      if (deleteUserError) throw deleteUserError;
 
-            const { data: remainingUsers, error: fetchRemainingError } = await supabase
-                .from('room_users')
-                .select('username, socketid')
-                .eq('roomcode', roomCode);
+      const { data: remainingUsers, error: fetchRemainingError } = await supabase
+          .from('room_users')
+          .select('username, socketid')
+          .eq('roomcode', roomCode);
 
-            if (fetchRemainingError) throw fetchRemainingError;
+      if (fetchRemainingError) throw fetchRemainingError;
 
-            socketIO.to(roomCode).emit('newUserResponse', remainingUsers);
+      socketIO.to(roomCode).emit('newUserResponse', remainingUsers);
 
-            // If the room is empty, delete all messages
-            if (remainingUsers.length === 0) {
-                const { error: deleteMessagesError } = await supabase
-                    .from('messages')
-                    .delete()
-                    .eq('roomcode', roomCode);
+      // If the room is empty, delete all messages and the game session
+      if (remainingUsers.length === 0) {
+          // Delete all messages for the room
+          const { error: deleteMessagesError } = await supabase
+              .from('messages')
+              .delete()
+              .eq('roomcode', roomCode);
 
-                if (deleteMessagesError) throw deleteMessagesError;
-            }
+          if (deleteMessagesError) throw deleteMessagesError;
 
-            socket.leave(roomCode);
-        } catch (error) {
-            console.error('Error handling disconnect:', error.message);
-        }
-    });
+          // Delete the game session for the room
+          const { error: deleteGameSessionError } = await supabase
+              .from('game_sessions')
+              .delete()
+              .eq('room_code', roomCode);
+
+          if (deleteGameSessionError) throw deleteGameSessionError;
+
+          console.log(`Deleted game session for room: ${roomCode}`);
+      }
+
+      socket.leave(roomCode);
+  } catch (error) {
+      console.error('Error handling disconnect:', error.message);
+  }
+});
 });
 
 
