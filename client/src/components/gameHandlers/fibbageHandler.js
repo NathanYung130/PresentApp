@@ -9,22 +9,26 @@ const FibbageHandler = ({ socket }) => {
     const [gameEnded, setGameEnded] = useState(false);
 
     useEffect(() => {
-        socket.on('gameStateChange', ({ state, sittingOutPlayer }) => {
+        const handleGameStateChange = ({ state, sittingOutPlayer }) => {
             dispatch(setGameState({ state, sittingOutPlayer }));
             if (state === 'gameEnd') {
                 setGameEnded(true);
             }
-        });
+        };
+
+        socket.on('gameStateChange', handleGameStateChange);
 
         return () => {
-            socket.off('gameStateChange');
+            socket.off('gameStateChange', handleGameStateChange);
         };
     }, [socket, dispatch]);
 
     useEffect(() => {
-        switch(gameState) {
+        switch (gameState) {
             case 'answerInitialQuestion':
-                console.log('Game State: Answer question 1');
+                if (sittingOutPlayer === 'na') {
+                    console.log('Game State: Answer question 1');
+                }
                 break;
             case 'othersAnswering':
                 if (userName === sittingOutPlayer) {
@@ -57,7 +61,7 @@ const FibbageHandler = ({ socket }) => {
         }
     };
 
-    return(
+    return (
         <>
             <h1>Fibbage!</h1>
             <h2>Current Game State: {gameState}</h2>

@@ -93,16 +93,23 @@ socketIO.on('connection', (socket) => {
             if (insertError) throw insertError;
 
             // Notify all clients in the room that the game has started
+            // socketIO.to(socket.roomCode).emit('gameStateChange', { 
+            //     state: 'answerInitialQuestion', 
+            //     message: 'Answer question 1' 
+            // });
+            // socketIO.to(socket.roomCode).emit('gameStateChange', { state: 'answerInitialQuestion', sittingOutPlayer: 'na'});
+            state = 'answeringInitialQuestions';
             socketIO.to(socket.roomCode).emit('gameStateChange', { 
-                state: 'answerInitialQuestion', 
-                message: 'Answer question 1' 
-            });
+              state: gameStates[0], 
+              sittingOutPlayer: 'na' 
+          }); console.log(state, ' state');
+
         } catch (error) {
             console.error('Error starting game:', error.message);
         }
     });
 
-    // the Handler for advancing to the next game state
+    // Handler for advancing to the next game state
     socket.on('nextGameState', async () => {
         try {
             // Fetch the current game session data from the database
@@ -123,7 +130,7 @@ socketIO.on('connection', (socket) => {
 
             // Determine the next game state
             if (currentStateIndex === -1 || currentStateIndex === gameStates.length - 1) {
-                nextState = gameStates[0];
+                nextState = gameStates[1];
             } else {
                 nextState = gameStates[currentStateIndex + 1];
             }
@@ -133,7 +140,7 @@ socketIO.on('connection', (socket) => {
                 
                 if (availablePlayers.length === 0) {
                     // If all players have sat out, move to leaderboard
-                    nextState = 'leaderboard';
+                    nextState = 'endGame';
                 } else {
                     // Choose a new player to sit out
                     sittingOutPlayer = availablePlayers[0];
@@ -187,9 +194,9 @@ socket.on('message', async (data) => {
         } catch (error) {
             console.error('Error handling message:', error.message);
         }
-    });
+});
 
-    socket.on('disconnect', async () => {
+socket.on('disconnect', async () => {
         try {
             const roomCode = socket.roomCode;
             console.log('User disconnected:', socket.id);
