@@ -59,10 +59,16 @@ socketIO.on('connection', (socket) => {
     */
     //USER STARTS GAME: this one is to emit
     socket.on('startGame', () => {
-        //console.log('Game started in room: ', roomCode);
+        console.log('Game started in room: ', roomCode);
         //Broadcast to all users that game has started
         socketIO.to(roomCode).emit('gameStarted');
-    })
+    });
+
+    socket.on('pingServer', () => {
+        console.log('pinged');
+        //Broadcast to all users that game has started
+        //socketIO.to(roomCode).emit('gameStarted');
+    });
 
     socket.on('startGame', async () => {
         try {
@@ -156,6 +162,7 @@ socketIO.on('connection', (socket) => {
         } catch (error) {
             console.error('Error changing game state:', error.message);
         }
+
     });
 
 
@@ -210,7 +217,7 @@ socket.on('message', async (data) => {
 
             socketIO.to(roomCode).emit('newUserResponse', remainingUsers);
 
-            // If the room is empty, delete all messages
+            // If the room is empty, delete all messages 
             if (remainingUsers.length === 0) {
                 const { error: deleteMessagesError } = await supabase
                     .from('messages')
@@ -227,6 +234,30 @@ socket.on('message', async (data) => {
     });
 });
 
+socketIO.on('query', (socket) => {
+    
+    socket.on('ifRoomExists', async ({ targetRoom }) => {
+        console.log(`⚡: ${socket.id} Made a request!`);
+        // Fetch roomcode
+        const { data: room, error: fetchError } = await supabase
+            .from('room_users')
+            .select('roomcode')
+            .eq('roomcode', targetRoom);
+
+            if (fetchError) {
+                console.error(fetchError);
+              } else {
+                  console.log(room);
+                const roomExists = room.length > 0;
+                console.log('RoomChecker: ',roomExists); // true or false
+              }
+    })
+
+    socket.on('pingServer', () => {
+        console.log('Ping received');
+        socket.emit('pongClient');
+    });
+});
 
 http.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);

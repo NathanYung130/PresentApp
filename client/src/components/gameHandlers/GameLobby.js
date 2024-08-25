@@ -6,7 +6,7 @@ import { startGame } from '../../Redux/gameSlice';
 const GameLobby = ({ socket }) => {
     const dispatch = useDispatch();
     const { roomId } = useSelector(state => state.room);
-    console.log('socket: ', socket);
+    //console.log('socket: ', socket);
 
     useEffect(() => {
         socket.on('gameStateChange', ({ state }) => {
@@ -24,6 +24,7 @@ const GameLobby = ({ socket }) => {
         // Emit 'startGame' message to Socket.IO
         // socket.emit('startGame', { /* data to be sent (optional) */ }); // Replace with relevant data if needed
         socket.emit('startGame', { roomCode: roomId });
+        socket.emit('pingServer', { roomCode: roomId });
     };
 
     return(

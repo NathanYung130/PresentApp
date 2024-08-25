@@ -10,21 +10,6 @@ const ChatBody = ({ messages, lastMessageRef, socket }) => {
     const roomId = useSelector((state) => state.room.roomId);
     const currentUserName = useSelector((state) => state.room.userName);
 
-    const handleLeaveChat = () => {
-        //update Redux store with roomId
-        dispatch(setUser(null));
-        dispatch(setRoomId(null));
-        dispatch(setSocketId(null));
-
-        localStorage.removeItem('userName');
-        navigate('/');
-        window.location.reload();
-    };
-
-    const handleGameStart = () => {
-    // Emit 'startGame' message to Socket.IO
-    socket.emit('startGame'); // Replace with relevant data if needed
-    };
 
     return (
         <>
