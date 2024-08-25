@@ -23,6 +23,26 @@ socketIO.on('connection', (socket) => {
 
     socket.on('joinRoom', async ({ userName, roomCode }) => {
         try {
+            // Use a transaction to ensure atomicity
+            const { data: room, error: roomFetchError } = await supabase
+                .from('room_users')
+                .select('roomcode')
+                .eq('roomcode', roomCode);
+
+            if (roomFetchError) {
+                throw roomFetchError;
+            }
+
+            if (room.length === 0) {
+                console.log('room does not exist')
+                // If the room does not exist, send an error back to the client
+                socket.emit('roomNotFound');
+                return;
+            } else {
+                console.log('room exists')
+            }
+
+
             socket.join(roomCode);
             socket.roomCode = roomCode;
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import supabase from '../supabaseClient';
@@ -65,6 +65,25 @@ const Home = ({ socket }) => {
         updateStores();
 
     };
+
+    //roomvcheck
+    
+
+    useEffect(() => {
+        // Listen for the 'gameStarted' event from the server
+        socket.on('roomNotFound', () => {
+            setExists(true);
+            console.log('game not found!'); 
+        });
+
+        // Cleanup event listener when the component unmounts
+        return () => {
+            socket.off('roomNotFound');
+        };
+    }, [setExists]);
+
+
+    
 
     return (
         <>
