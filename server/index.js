@@ -59,7 +59,7 @@ socketIO.on('connection', (socket) => {
     */
     //USER STARTS GAME: this one is to emit
     socket.on('startGame', () => {
-        //console.log('Game started in room: ', roomCode);
+        console.log('Game started in room: ', roomCode);
         //Broadcast to all users that game has started
         socketIO.to(roomCode).emit('gameStarted');
     })
@@ -139,7 +139,7 @@ socketIO.on('connection', (socket) => {
                 const availablePlayers = data.players.filter(player => !playersWhoSatOut.includes(player));
                 
                 if (availablePlayers.length === 0) {
-                    // If all players have sat out, move to leaderboard
+                    // If all players have sat out, move to endgame
                     nextState = 'endGame';
                 } else {
                     // Choose a new player to sit out
