@@ -8,17 +8,30 @@ const GameLobby = ({ socket }) => {
     const { roomId } = useSelector(state => state.room);
     console.log('socket: ', socket);
 
-    useEffect(() => {
-        socket.on('gameStateChange', ({ state }) => {
-            if (state === 'answerInitialQuestion') {
-                dispatch(startGame());
-            }
-        });
+    // useEffect(() => {
+    //     socket.on('gameStateChange', ({ state }) => {
+    //         if (state === 'answerInitialQuestion') {
+    //             dispatch(startGame());
+    //         }
+    //     });
 
-        return () => {
-            socket.off('gameStateChange');
-        };
-    }, [dispatch, socket]);
+    //     return () => {
+    //         socket.off('gameStateChange');
+    //     };
+    // }, [dispatch, socket]);
+    useEffect(() => {
+    const handleGameStateChange = ({ state }) => {
+        if (state === 'answerInitialQuestion') {
+            dispatch(startGame());
+        }
+    };
+
+    socket.on('gameStateChange', handleGameStateChange);
+
+    return () => {
+        socket.off('gameStateChange', handleGameStateChange);
+    };
+}, [dispatch, socket]);
 
     const handleGameStart = () => {
         // Emit 'startGame' message to Socket.IO

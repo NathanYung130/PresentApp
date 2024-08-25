@@ -59,7 +59,7 @@ socketIO.on('connection', (socket) => {
     */
     //USER STARTS GAME: this one is to emit
     socket.on('startGame', () => {
-        //console.log('Game started in room: ', roomCode);
+        console.log('Game started in room: ', roomCode);
         //Broadcast to all users that game has started
         socketIO.to(roomCode).emit('gameStarted');
     })
@@ -93,10 +93,17 @@ socketIO.on('connection', (socket) => {
             if (insertError) throw insertError;
 
             // Notify all clients in the room that the game has started
+            // socketIO.to(socket.roomCode).emit('gameStateChange', { 
+            //     state: 'answerInitialQuestion', 
+            //     message: 'Answer question 1' 
+            // });
+            // socketIO.to(socket.roomCode).emit('gameStateChange', { state: 'answerInitialQuestion', sittingOutPlayer: 'na'});
+            state = 'answeringInitialQuestions';
             socketIO.to(socket.roomCode).emit('gameStateChange', { 
-                state: 'answerInitialQuestion', 
-                message: 'Answer question 1' 
-            });
+              state: gameStates[0], 
+              sittingOutPlayer: 'na' 
+          }); console.log(state, ' state');
+
         } catch (error) {
             console.error('Error starting game:', error.message);
         }
@@ -123,7 +130,7 @@ socketIO.on('connection', (socket) => {
 
             // Determine the next game state
             if (currentStateIndex === -1 || currentStateIndex === gameStates.length - 1) {
-                nextState = gameStates[0];
+                nextState = gameStates[1];
             } else {
                 nextState = gameStates[currentStateIndex + 1];
             }
@@ -132,8 +139,8 @@ socketIO.on('connection', (socket) => {
                 const availablePlayers = data.players.filter(player => !playersWhoSatOut.includes(player));
                 
                 if (availablePlayers.length === 0) {
-                    // If all players have sat out, move to leaderboard
-                    nextState = 'leaderboard';
+                    // If all players have sat out, move to endgame
+                    nextState = 'endGame';
                 } else {
                     // Choose a new player to sit out
                     sittingOutPlayer = availablePlayers[0];
@@ -187,44 +194,55 @@ socket.on('message', async (data) => {
         } catch (error) {
             console.error('Error handling message:', error.message);
         }
-    });
+});
 
-    socket.on('disconnect', async () => {
-        try {
-            const roomCode = socket.roomCode;
-            console.log('User disconnected:', socket.id);
+socket.on('disconnect', async () => {
+  try {
+      const roomCode = socket.roomCode;
+      console.log('User disconnected:', socket.id);
 
-            const { error: deleteUserError } = await supabase
-                .from('room_users')
-                .delete()
-                .eq('socketid', socket.id);
+      const { error: deleteUserError } = await supabase
+          .from('room_users')
+          .delete()
+          .eq('socketid', socket.id);
 
-            if (deleteUserError) throw deleteUserError;
+      if (deleteUserError) throw deleteUserError;
 
-            const { data: remainingUsers, error: fetchRemainingError } = await supabase
-                .from('room_users')
-                .select('username, socketid')
-                .eq('roomcode', roomCode);
+      const { data: remainingUsers, error: fetchRemainingError } = await supabase
+          .from('room_users')
+          .select('username, socketid')
+          .eq('roomcode', roomCode);
 
-            if (fetchRemainingError) throw fetchRemainingError;
+      if (fetchRemainingError) throw fetchRemainingError;
 
-            socketIO.to(roomCode).emit('newUserResponse', remainingUsers);
+      socketIO.to(roomCode).emit('newUserResponse', remainingUsers);
 
-            // If the room is empty, delete all messages
-            if (remainingUsers.length === 0) {
-                const { error: deleteMessagesError } = await supabase
-                    .from('messages')
-                    .delete()
-                    .eq('roomcode', roomCode);
+      // If the room is empty, delete all messages and the game session
+      if (remainingUsers.length === 0) {
+          // Delete all messages for the room
+          const { error: deleteMessagesError } = await supabase
+              .from('messages')
+              .delete()
+              .eq('roomcode', roomCode);
 
-                if (deleteMessagesError) throw deleteMessagesError;
-            }
+          if (deleteMessagesError) throw deleteMessagesError;
 
-            socket.leave(roomCode);
-        } catch (error) {
-            console.error('Error handling disconnect:', error.message);
-        }
-    });
+          // Delete the game session for the room
+          const { error: deleteGameSessionError } = await supabase
+              .from('game_sessions')
+              .delete()
+              .eq('room_code', roomCode);
+
+          if (deleteGameSessionError) throw deleteGameSessionError;
+
+          console.log(`Deleted game session for room: ${roomCode}`);
+      }
+
+      socket.leave(roomCode);
+  } catch (error) {
+      console.error('Error handling disconnect:', error.message);
+  }
+});
 });
 
 
