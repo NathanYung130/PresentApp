@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import supabase from '../supabaseClient';
+
 import { nanoid } from 'nanoid'
 
 import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
@@ -9,32 +9,17 @@ import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
 import './styles/Home.css'
 
 const Home = ({ socket }) => {
+    //++++++++Declare Variables++++++++\\
     const navigate = useNavigate();
     const dispatch = useDispatch(); // Import useDispatch from 'react-redux'
 
     const [userName, setUserName] = useState('');
     const [roomCode, setRoomCode] = useState('');
-    const [exists, setExists] = useState(null);
-
-    const checkRoomId = async () => {
-        const { data, error } = await supabase
-          .from('room_users')
-          .select('roomcode')
-          .eq('roomcode', roomCode);
-      
-        if (error) {
-          console.error(error);
-          setExists(false);
-        } else {
-            console.log(data);
-          const roomExists = data.length > 0;
-          console.log('RoomChecker: ',roomExists); // true or false
-          setExists(data.length > 0);
-        }
-    };
+    const [createState, setCreateState] = useState(false);
+    //+++++++++++++++++++++++++++++++++++\\
 
     //updates All front end based stores
-    function updateStores(){
+    const updateStores = useCallback(() => {
         localStorage.setItem('userName', userName);
         localStorage.setItem('roomCode', roomCode);
 
@@ -42,49 +27,75 @@ const Home = ({ socket }) => {
         dispatch(setUser(userName));
         dispatch(setRoomId(roomCode));
         dispatch(setSocketId(socket.id));
-    };
+    }, [userName, roomCode, dispatch, socket.id]);
 
+    // Handle search buton press, emits to socket to check if room exists
     const handleSearch = () => {
-
-        if (roomCode.length < 6) {
-            alert("Username or Room Code must be at least 6 characters long!");
+        if ((roomCode.length < 6)) {
+            handlePopup('roomError');
             return; // Prevent form submission if validation fails
+        } else if(userName.length < 1){
+            handlePopup('userNameError');
         }
         updateStores();
-        checkRoomId();
-        // Send the username and room code to the Node.js server
-        socket.emit('joinRoom', { userName, roomCode, socketID: socket.id });
-        navigate(`/chat/${roomCode}`);
+        socket.emit('queryRoom', { userName, roomCode});
+
     };
 
+    // Handle creation of room. emits to socket to check, the socket response
+    // is then collected by useEffect, which handles the joining of the room
     const handleCreate = () =>{
-        if (roomCode.length < 6) {
-            alert("Username or Room Code must be at least 6 characters long!");
+        if (userName.length < 1) {
+            handlePopup('userNameError');
             return; // Prevent form submission if validation fails
         }
+        setCreateState(true);
+        let TempId = nanoid(6);
+        setRoomCode(TempId);
         updateStores();
+        socket.emit('queryRoom', { userName, roomCode});
 
     };
 
-    //roomvcheck
-    
-
+    // useEffect handles the output of listener functions that pull from socket.io
     useEffect(() => {
-        // Listen for the 'gameStarted' event from the server
-        socket.on('roomNotFound', () => {
-            setExists(true);
-            console.log('game not found!'); 
-        });
+        const handleRoomNotFound = () => {
+            if (createState){
 
-        // Cleanup event listener when the component unmounts
-        return () => {
-            socket.off('roomNotFound');
+                updateStores();
+                socket.emit('joinRoom', { userName, roomCode, socketID: socket.id });
+                navigate(`/chat/${roomCode}`);
+            }else{
+                handlePopup('roomError');
+            }
         };
-    }, [setExists]);
+        const handleRoomFound = () => {
+            socket.emit('joinRoom', { userName, roomCode, socketID: socket.id });
+            navigate(`/chat/${roomCode}`);
+        };
 
+        // Attach socket listeners
+        socket.on('roomNotFound', handleRoomNotFound);
+        socket.on('roomFound', handleRoomFound);
 
-    
+        return () =>{
+            socket.off('roomNotFound', handleRoomNotFound);
+            socket.off('roomFound', handleRoomFound);
+        }
 
+    }, [roomCode, navigate, createState, socket, updateStores, userName]);
+
+    //========== Pop Up control: =============\\
+    const [popup, setPopup] = useState(null);
+
+    const handlePopup = (popupType) => {
+      setPopup(popupType);
+    };
+  
+    const closePopup = () => {
+      setPopup(null);
+    };
+    //=========================================\\
     return (
         <>
         <h1 className = "Title">Joe-Box</h1>
@@ -115,32 +126,24 @@ const Home = ({ socket }) => {
                 <button className = "interaction"type = "button" onClick = {handleCreate}>Create Room</button>
             </div>
         </form>
+
+        {popup && (
+            <div className="popup">
+                <div className="popup-content">
+                    <span className="close" onClick={closePopup}>&times;</span>
+                    {popup === 'userNameError' &&
+                    <div className= "popText">
+                        <p>Enter a Username!</p>
+                    </div>}
+                    {popup === 'roomError' &&
+                    <div className= "popText">
+                        <p>Room Codes Must be At Least 6 Characters!</p>
+                    </div>}
+                </div>
+            </div>
+        )}
         </>
     );
 };
 
 export default Home;
-
-
-
-
-
-
-
-
-    /*
-    const checkRoomId = async (roomId) => {
-        const { data, error } = await supabase
-          .from('room_users')
-          .select('roomcode')
-          .eq('roomcode', roomId);
-      
-        if (error) {
-          console.error(error);
-        } else {
-            console.log(data);
-          const roomExists = data.length > 0;
-          console.log('RoomChecker: ',roomExists); // true or false
-          return roomExists;
-        }
-      };*/

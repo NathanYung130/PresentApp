@@ -15,11 +15,38 @@ const socketIO = require("socket.io")(http, {
 
 const supabase = require('./supabaseClient');
 
+
 app.use(cors());
 const gameStates = ['answerInitialQuestion', 'othersAnswering', 'voting', 'leaderboard'];
 
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
+
+    socket.on('queryRoom', async ({ userName, roomCode }) => {
+        const { data: room, error: roomFetchError } = await supabase
+            .from('room_users')
+            .select('roomcode')
+            .eq('roomcode', roomCode);
+
+        if (roomFetchError) {
+            throw roomFetchError;
+        }
+        // const roomExists = room.length > 0;
+        // console.log('queryRoom response: ',roomExists)
+        // socket.emit('roomStatus', roomExists);
+        // return;
+        if (room.length === 0) {
+            console.log('room does not exist')
+            // If the room does not exist, send an error back to the client
+            socket.emit('roomNotFound');
+
+        } else {
+            console.log('room exists');
+            socket.emit('roomFound');
+        }
+
+        return;
+    });
 
     socket.on('joinRoom', async ({ userName, roomCode }) => {
         try {
@@ -33,19 +60,20 @@ socketIO.on('connection', (socket) => {
                 throw roomFetchError;
             }
 
-            if (room.length === 0) {
-                console.log('room does not exist')
-                // If the room does not exist, send an error back to the client
-                socket.emit('roomNotFound');
-                return;
-            } else {
-                console.log('room exists')
-            }
+            // if (room.length === 0) {
+            //     console.log('room does not exist')
+            //     // If the room does not exist, send an error back to the client
+            //     socket.emit('roomNotFound');
 
+            // } else {
+            //     console.log('room exists');
+            //     socket.emit('roomFound');
+            // }
 
             socket.join(roomCode);
             socket.roomCode = roomCode;
 
+            console.log('Adding to store');
             const { error: insertError } = await supabase
                 .from('room_users')
                 .insert([{ username: userName, roomcode: roomCode, socketid: socket.id }]);
@@ -82,12 +110,6 @@ socketIO.on('connection', (socket) => {
         console.log('Game started in room: ', roomCode);
         //Broadcast to all users that game has started
         socketIO.to(roomCode).emit('gameStarted');
-    });
-
-    socket.on('pingServer', () => {
-        console.log('pinged');
-        //Broadcast to all users that game has started
-        //socketIO.to(roomCode).emit('gameStarted');
     });
 
     socket.on('startGame', async () => {
