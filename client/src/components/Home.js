@@ -66,7 +66,7 @@ const Home = ({ socket }) => {
                 socket.emit('joinRoom', { userName, roomCode, socketID: socket.id });
                 navigate(`/chat/${roomCode}`);
             }else{
-                handlePopup('roomError');
+                handlePopup('noRoom');
             }
         };
         const handleRoomFound = () => {
@@ -138,6 +138,10 @@ const Home = ({ socket }) => {
                     {popup === 'roomError' &&
                     <div className= "popText">
                         <p>Room Codes Must be At Least 6 Characters!</p>
+                    </div>}
+                    {popup === 'noRoom' &&
+                    <div className= "popText">
+                        <p>No Room Found!</p>
                     </div>}
                 </div>
             </div>
