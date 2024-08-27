@@ -73,6 +73,40 @@ socketIO.on('connection', (socket) => {
                 .eq('roomcode', socket.roomCode);
 
             if (fetchError) throw fetchError;
+
+
+
+
+            // Fetch all questions
+            const { data: questions, error: fetchQuestionsError } = await supabase
+                .from('questions')
+                .select('*');
+            
+            if (fetchQuestionsError) throw fetchQuestionsError;
+            console.log(questions)
+            // Shuffle the questions array and assign each player a unique question
+            const shuffledQuestions = questions.sort(() => 0.5 - Math.random());
+            const playerQuestions = users.map((user, index) => ({
+                username: user.username,
+                question: shuffledQuestions[index % shuffledQuestions.length].question_text,
+            }));
+            
+
+            // Store the assigned questions in a Redux store or send them to each client
+            playerQuestions.forEach(({ username, question }) => {
+                // socketIO.to(socket.roomCode).emit('assignedQuestion', { username, question });
+                console.log(`Emitting question for username: ${username}, question: ${question}`);
+                socketIO.to(socket.roomCode).emit('assignedQuestion', { username, question });
+                console.log('room code: ', socket.roomCode);
+                
+            //   console.log('username: ', username, 'question: ', question);
+            });
+            
+
+
+
+
+
             
             // Extract usernames and shuffle the player order randoml
             const players = users.map(user => user.username);
@@ -128,7 +162,7 @@ socketIO.on('connection', (socket) => {
             let playersWhoSatOut = data.players_who_sat_out || [];
             let currentStateIndex = gameStates.indexOf(data.game_stage);
 
-            // Determine the next game state
+            // Determine the next game state, but doesn't go back to initial state
             if (currentStateIndex === -1 || currentStateIndex === gameStates.length - 1) {
                 nextState = gameStates[1];
             } else {

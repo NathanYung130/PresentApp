@@ -88,6 +88,7 @@ const initialState = {
   gameState: null,
   sittingOutPlayer: null,
   playersWhoSatOut: [],
+  currentQuestion: '',
 };
 
 const gameSlice = createSlice({
@@ -115,8 +116,15 @@ const gameSlice = createSlice({
       // Return updated state with new list of players who sat out
       return { ...state, playersWhoSatOut: action.payload };
     },
+    setCurrentQuestion: (state, action) => {
+      // Return updated state with new current question
+      return { ...state, currentQuestion: action.payload.question };
+    },
+    // setCurrentQuestion: (state, action) => {
+    //   state.currentQuestion = action.payload;
+    // },
   },
 });
 
-export const { startGame, resetGame, setGameState, updatePlayersWhoSatOut } = gameSlice.actions;
+export const { startGame, resetGame, setGameState, updatePlayersWhoSatOut, setCurrentQuestion } = gameSlice.actions;
 export default gameSlice.reducer;
