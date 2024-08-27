@@ -31,22 +31,22 @@ const FibbageHandler = ({ socket }) => {
         //         dispatch(setCurrentQuestion({question}));
         //     }
         // };
-        const handleAssignQuestion = ({ username, question }) => {
-            console.log('Received assigned question:', username, question);
-            if (username === userName) {
-                console.log('Matching username, dispatching action');
-                dispatch(setCurrentQuestion({ question }));
-            }
-        };
+        // const handleAssignQuestion = ({ username, question }) => {
+        //     console.log('Received assigned question:', username, question);
+        //     if (username === userName) {
+        //         console.log('Matching username, dispatching action');
+        //         dispatch(setCurrentQuestion({ question }));
+        //     }
+        // };
 
        
-        socket.on('assignedQuestion', handleAssignQuestion);
+        // socket.on('assignedQuestion', handleAssignQuestion);
         socket.on('gameStateChange', handleGameStateChange);
 
         return () => {
             console.log('Cleaning up socket listeners');
             socket.off('gameStateChange', handleGameStateChange);
-            socket.off('assignedQuestion', handleAssignQuestion);
+            // socket.off('assignedQuestion', handleAssignQuestion);
 
         };
     }, [socket, dispatch, userName]);
@@ -55,7 +55,7 @@ const FibbageHandler = ({ socket }) => {
     const renderGameComponent = () => {
         switch (gameState) {
           case 'answerInitialQuestion':
-            return <AnswerInitialQuestion question={currentQuestion}/>;
+            return <AnswerInitialQuestion question={currentQuestion} socket={socket} />;
           case 'othersAnswering':
             return <OthersAnswering question="What is the dumbest thing ____ said?" />;
         //   case 'voting':

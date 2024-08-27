@@ -6,6 +6,7 @@ import FibbageHandler from './fibbageHandler';
 const GameDisplay = ({ socket }) => {
     const gameStart = useSelector((state) => state.game.gameStarted);
     console.log('gameStart; ', gameStart);
+    
     return(
         <div className="lobby">
             {gameStart ? (
