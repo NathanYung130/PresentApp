@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setCurrentQuestion, setGameState } from '../../Redux/gameSlice';
+import { setCurrentQuestion, setGameState, setQuestionMap } from '../../Redux/gameSlice';
 import AnswerInitialQuestion from './gamePages/AnswerInitialQuestion';
 import OthersAnswering from './gamePages/OthersAnswering';
 
 const FibbageHandler = ({ socket }) => {
     const dispatch = useDispatch();
-    const { gameState, currentQuestion, sittingOutPlayer } = useSelector(state => state.game);
+    const { gameState, currentQuestion, sittingOutPlayer, questionMap } = useSelector(state => state.game);
     const { userName, roomId } = useSelector(state => state.room);
     const [gameEnded, setGameEnded] = useState(false);
 
@@ -31,33 +31,42 @@ const FibbageHandler = ({ socket }) => {
         //         dispatch(setCurrentQuestion({question}));
         //     }
         // };
-        // const handleAssignQuestion = ({ username, question }) => {
-        //     console.log('Received assigned question:', username, question);
-        //     if (username === userName) {
-        //         console.log('Matching username, dispatching action');
-        //         dispatch(setCurrentQuestion({ question }));
-        //     }
-        // };
+        const handleAssignQuestion = ({ username, question }) => {
+            console.log('Received assigned question:', username, question);
+            if (username === userName) {
+                console.log('Matching username, dispatching action');
+                dispatch(setCurrentQuestion({ question }));
+            }
+            dispatch(setQuestionMap({ [username]: question }));
+        };
 
        
-        // socket.on('assignedQuestion', handleAssignQuestion);
+        socket.on('assignedQuestion', handleAssignQuestion);
         socket.on('gameStateChange', handleGameStateChange);
 
         return () => {
             console.log('Cleaning up socket listeners');
             socket.off('gameStateChange', handleGameStateChange);
-            // socket.off('assignedQuestion', handleAssignQuestion);
+            socket.off('assignedQuestion', handleAssignQuestion);
 
         };
     }, [socket, dispatch, userName]);
 
 
     const renderGameComponent = () => {
+        //question that is going to be displayed in (others answering)
+        const questionToDisplay = questionMap[sittingOutPlayer] || currentQuestion;
+
         switch (gameState) {
           case 'answerInitialQuestion':
             return <AnswerInitialQuestion question={currentQuestion} socket={socket} />;
-          case 'othersAnswering':
-            return <OthersAnswering question="What is the dumbest thing ____ said?" />;
+            case 'othersAnswering':
+                // Use question from the questionMap if sittingOutPlayer is defined
+                return sittingOutPlayer && questionMap[sittingOutPlayer] ? (
+                  <OthersAnswering question={questionToDisplay} />
+                ) : (
+                  <OthersAnswering question="Default question or error message" />
+                );
         //   case 'voting':
         //     return <Voting answers={['took a shit at truck stop', 'said the n word', 'Green']} handleVote={(answer) => console.log(`Voted for: ${answer}`)} />;
         //   case 'sittingOut':

@@ -89,6 +89,8 @@ const initialState = {
   sittingOutPlayer: null,
   playersWhoSatOut: [],
   currentQuestion: '',
+  questionMap: {}, // To store username to question mapping
+  currentPlayerIndex: 0, // To track the index of the current sitting out player
 };
 
 const gameSlice = createSlice({
@@ -123,8 +125,25 @@ const gameSlice = createSlice({
     // setCurrentQuestion: (state, action) => {
     //   state.currentQuestion = action.payload;
     // },
+    setQuestionMap(state, action) {
+      // Properly merge new questions with existing questionMap
+      state.questionMap = {
+        ...state.questionMap, // Keep existing entries
+        ...action.payload,    // Merge in new question(s)
+      };
+    },
+    setCurrentPlayerIndex: (state, action) => {
+      return { ...state, currentPlayerIndex: action.payload };
+    },
+    getNextQuestion: (state) => {
+      const usernames = Object.keys(state.questionMap);
+      state.currentPlayerIndex = (state.currentPlayerIndex + 1) % usernames.length; // Cycle through the usernames
+      const nextPlayer = usernames[state.currentPlayerIndex];
+      state.sittingOutPlayer = nextPlayer;
+      state.currentQuestion = state.questionMap[nextPlayer];
+    },
   },
 });
 
-export const { startGame, resetGame, setGameState, updatePlayersWhoSatOut, setCurrentQuestion } = gameSlice.actions;
+export const { startGame, resetGame, setGameState, updatePlayersWhoSatOut, setCurrentQuestion, setQuestionMap, setCurrentPlayerIndex, getNextQuestion } = gameSlice.actions;
 export default gameSlice.reducer;

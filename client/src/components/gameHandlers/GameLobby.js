@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { startGame } from '../../Redux/gameSlice';
-import { setCurrentQuestion, setGameState } from '../../Redux/gameSlice';
+import { setCurrentQuestion, setQuestionMap, setGameState } from '../../Redux/gameSlice';
 //import { useSelector } from 'react-redux';
 
 const GameLobby = ({ socket }) => {
@@ -10,7 +10,6 @@ const GameLobby = ({ socket }) => {
     const { userName} = useSelector(state => state.room);
     
     const { gameState, currentQuestion, sittingOutPlayer } = useSelector(state => state.game);
-    console.log('socket: ', socket);
 
     // useEffect(() => {
     //     socket.on('gameStateChange', ({ state }) => {
@@ -34,10 +33,21 @@ const GameLobby = ({ socket }) => {
 
         const handleAssignQuestion = ({ username, question }) => {
             console.log('Received assigned question:', username, question);
-            if (username === userName) {
+            if (userName === username) {
                 console.log('Matching username, dispatching action');
                 dispatch(setCurrentQuestion({ question }));
+            } else {
+                console.log('username unmatched');
             }
+            
+            
+            dispatch(setQuestionMap({ [username]: question }));
+
+
+            if (sittingOutPlayer === username){
+                console.log(sittingOutPlayer, 'sitting out player. their question:' ,question)
+            }
+
             
         };
 
