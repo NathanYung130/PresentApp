@@ -65,8 +65,6 @@ const GameLobby = ({ socket }) => {
         // Emit 'startGame' message to Socket.IO
         // socket.emit('startGame', { /* data to be sent (optional) */ }); // Replace with relevant data if needed
         socket.emit('startGame', { roomCode: roomId });
-        dispatch(startGame());
-
     };
 
     return(

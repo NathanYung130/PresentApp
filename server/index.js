@@ -15,17 +15,52 @@ const socketIO = require("socket.io")(http, {
 
 const supabase = require('./supabaseClient');
 
+
 app.use(cors());
 const gameStates = ['answerInitialQuestion', 'othersAnswering', 'voting', 'leaderboard'];
 
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
 
+    socket.on('queryRoom', async ({ userName, roomCode }) => {
+        const { data: room, error: roomFetchError } = await supabase
+            .from('room_users')
+            .select('roomcode')
+            .eq('roomcode', roomCode);
+
+        if (roomFetchError) {
+            throw roomFetchError;
+        }
+
+        if (room.length === 0) {
+            console.log('room does not exist')
+            // If the room does not exist, send an error back to the client
+            socket.emit('roomNotFound');
+
+        } else {
+            console.log('room exists');
+            socket.emit('roomFound');
+        }
+
+        return;
+    });
+
     socket.on('joinRoom', async ({ userName, roomCode }) => {
         try {
+            // Use a transaction to ensure atomicity
+            const { data: room, error: roomFetchError } = await supabase
+                .from('room_users')
+                .select('roomcode')
+                .eq('roomcode', roomCode);
+
+            if (roomFetchError) {
+                throw roomFetchError;
+            }
+
             socket.join(roomCode);
             socket.roomCode = roomCode;
 
+            console.log('Adding to store');
             const { error: insertError } = await supabase
                 .from('room_users')
                 .insert([{ username: userName, roomcode: roomCode, socketid: socket.id }]);
@@ -46,23 +81,17 @@ socketIO.on('connection', (socket) => {
         }
     
 
-     /*
+     
     //=============== GAME START HANDLER ==================
     //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
     //Game start notifier, activated when user clicks "Start Game"
     //@data = any data to be passed (to be decided if this is neccessary)
-    socket.on('startGame', (data) => {
-        console.log('Game started in room: ', roomCode);
-        //Broadcast to all users that game has started
-        socketIO.to(roomCode).emit('gameStarted', roomCode);
-        })
-    */
     //USER STARTS GAME: this one is to emit
     socket.on('startGame', () => {
         console.log('Game started in room: ', roomCode);
         //Broadcast to all users that game has started
         socketIO.to(roomCode).emit('gameStarted');
-    })
+    });
 
     socket.on('startGame', async () => {
         try {
@@ -197,6 +226,7 @@ socketIO.on('connection', (socket) => {
         } catch (error) {
             console.error('Error changing game state:', error.message);
         }
+
     });
 
 
@@ -279,6 +309,30 @@ socket.on('disconnect', async () => {
 });
 });
 
+socketIO.on('query', (socket) => {
+    
+    socket.on('ifRoomExists', async ({ targetRoom }) => {
+        console.log(`⚡: ${socket.id} Made a request!`);
+        // Fetch roomcode
+        const { data: room, error: fetchError } = await supabase
+            .from('room_users')
+            .select('roomcode')
+            .eq('roomcode', targetRoom);
+
+            if (fetchError) {
+                console.error(fetchError);
+              } else {
+                  console.log(room);
+                const roomExists = room.length > 0;
+                console.log('RoomChecker: ',roomExists); // true or false
+              }
+    })
+
+    socket.on('pingServer', () => {
+        console.log('Ping received');
+        socket.emit('pongClient');
+    });
+});
 
 http.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
