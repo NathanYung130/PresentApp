@@ -57,7 +57,7 @@ const FibbageHandler = ({ socket }) => {
 
         switch (gameState) {
           case 'answerInitialQuestion':
-            return <AnswerInitialQuestion question={currentQuestion} socket={socket} />;
+            return <AnswerInitialQuestion question={currentQuestion} userName={userName} roomID={roomId} />;
             case 'othersAnswering':
                 // Use question from the questionMap if sittingOutPlayer is defined
                 return sittingOutPlayer && questionMap[sittingOutPlayer] ? (
@@ -69,8 +69,8 @@ const FibbageHandler = ({ socket }) => {
         //     return <Voting answers={['took a shit at truck stop', 'said the n word', 'Green']} handleVote={(answer) => console.log(`Voted for: ${answer}`)} />;
         //   case 'sittingOut':
         //     return <SittingOut />;
-        //   case 'leaderboard':
-        //     return <Leaderboard players={players} />;
+        //    case 'leaderboard':
+        //      return <Leaderboard players={players} />;
            default:
             return <div>Unknown game state</div>;
         }
