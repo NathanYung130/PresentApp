@@ -60,7 +60,7 @@ socketIO.on('connection', (socket) => {
             socket.join(roomCode);
             socket.roomCode = roomCode;
 
-            console.log('Adding to store');
+            console.log('Adding to store', socket.id);
             const { error: insertError } = await supabase
                 .from('room_users')
                 .insert([{ username: userName, roomcode: roomCode, socketid: socket.id }]);

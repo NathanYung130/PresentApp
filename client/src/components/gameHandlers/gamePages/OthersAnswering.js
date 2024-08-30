@@ -1,13 +1,49 @@
 import React from 'react';
+import { useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux'
+import supabase from '../../../supabaseClient';
 
-const OthersAnswering = ({ question }) => {
-  return (
-    <div className="game-screen">
-      <h2>Answer the Question!</h2>
-      <p>{question}</p>
-      {/* Form or input elements for submitting answers would go here */}
-    </div>
-  );
+
+
+const OthersAnswering = ({ question, socket }) => {
+    const input = useRef(null);
+    const [ hideButton, setHideButton ]= useState(false);
+
+    const user = useSelector((state) => state.room.userName);
+    const roomId = useSelector((state) => state.room.roomId);
+    const sitOut = useSelector((state) => state.game.sittingOutPlayer);
+    const currQuestion = useSelector((state) => state.game.currentQuestion);
+    const excludeMe = user === sitOut;
+
+    const handleAnswer = async() => {
+        setHideButton(true);
+        const currInput = input.current.value;
+
+        const { data, error: insertError } = await supabase
+        .from('question_answers')
+        .insert([{ roomcode: roomId, question: question, username: user, subAnswer: currInput}]);
+
+        
+
+    }
+
+    
+
+    return (
+        <div className="game-screen">
+            <h3>Answer the Question!</h3>
+            <h2>{question}</h2>
+            {/* Form or input elements for submitting answers would go here */}
+
+            <input className = "roomcode__input" ref = { input }/>
+            {hideButton ? (
+                <></>
+            ) : (
+                <button onClick = { handleAnswer }> Answer </button>
+            )}
+            
+        </div>
+    );
 };
 
 export default OthersAnswering;

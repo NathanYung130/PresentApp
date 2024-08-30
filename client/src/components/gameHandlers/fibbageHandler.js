@@ -3,18 +3,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setCurrentQuestion, setGameState } from '../../Redux/gameSlice';
 import AnswerInitialQuestion from './gamePages/AnswerInitialQuestion';
 import OthersAnswering from './gamePages/OthersAnswering';
+import Voting from './gamePages/OthersAnswering';
 
 const FibbageHandler = ({ socket }) => {
     const dispatch = useDispatch();
     const { gameState, currentQuestion, sittingOutPlayer } = useSelector(state => state.game);
     const { userName, roomId } = useSelector(state => state.room);
     const [gameEnded, setGameEnded] = useState(false);
-
-    //check if socket is on
    
     useEffect(() => {
     
-        console.log('Setting up socket listeners');
+
         const handleGameStateChange = ({ state, sittingOutPlayer }) => {
             console.log('Received game state change:', state, sittingOutPlayer);
             dispatch(setGameState({ state, sittingOutPlayer }));
@@ -22,31 +21,22 @@ const FibbageHandler = ({ socket }) => {
                 setGameEnded(true);
             }
         };
+        const handleAssignQuestion = ({ username, question }) => {
 
-        // const handleAssignQuestion = ({username, question }) => {
-        //     // socket.to(roomCode).emit('assignedQuestion', { username, question });
-        //     console.log('hello');
-        //     console.log(question);
-        //     if (username === userName) {
-        //         dispatch(setCurrentQuestion({question}));
-        //     }
-        // };
-        // const handleAssignQuestion = ({ username, question }) => {
-        //     console.log('Received assigned question:', username, question);
-        //     if (username === userName) {
-        //         console.log('Matching username, dispatching action');
-        //         dispatch(setCurrentQuestion({ question }));
-        //     }
-        // };
+            if (username === userName) {
+
+                dispatch(setCurrentQuestion({ question }));
+            }
+        };
 
        
-        // socket.on('assignedQuestion', handleAssignQuestion);
+        socket.on('assignedQuestion', handleAssignQuestion);
         socket.on('gameStateChange', handleGameStateChange);
 
         return () => {
-            console.log('Cleaning up socket listeners');
+
             socket.off('gameStateChange', handleGameStateChange);
-            // socket.off('assignedQuestion', handleAssignQuestion);
+            socket.off('assignedQuestion', handleAssignQuestion);
 
         };
     }, [socket, dispatch, userName]);
@@ -57,9 +47,9 @@ const FibbageHandler = ({ socket }) => {
           case 'answerInitialQuestion':
             return <AnswerInitialQuestion question={currentQuestion} socket={socket} />;
           case 'othersAnswering':
-            return <OthersAnswering question="What is the dumbest thing ____ said?" />;
-        //   case 'voting':
-        //     return <Voting answers={['took a shit at truck stop', 'said the n word', 'Green']} handleVote={(answer) => console.log(`Voted for: ${answer}`)} />;
+            return <OthersAnswering question="What is the dumbest thing ____ said?" socket={socket} />;
+          case 'voting':
+            return <Voting />;
         //   case 'sittingOut':
         //     return <SittingOut />;
         //   case 'leaderboard':
@@ -82,7 +72,7 @@ const FibbageHandler = ({ socket }) => {
             <h1>Fibbage!</h1>
             {renderGameComponent()}
             <h2>Current Game State: {gameState}</h2>
-            {!gameEnded && <button onClick={() => socket.emit('nextGameState', { roomCode: roomId })}>Next State</button>}
+            {!gameEnded && <button onClick={ handleNextState }>Next State</button>}
             {gameEnded && <p>Game has ended!</p>}
 
             {sittingOutPlayer && <p>Sitting Out Player: {sittingOutPlayer}</p>}

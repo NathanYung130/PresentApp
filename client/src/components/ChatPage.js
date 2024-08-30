@@ -5,7 +5,7 @@ import ChatFooter from './ChatFooter';
 import GameDisplay from './gameHandlers/GameDisplay';
 import supabase from '../supabaseClient';
 
-import styles from './styles/ChatPage.css';
+import './styles/ChatPage.css';
 
 const ChatPage = ({ socket }) => {
     const [messages, setMessages] = useState([]);

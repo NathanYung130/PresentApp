@@ -10,7 +10,6 @@ const GameLobby = ({ socket }) => {
     const { userName} = useSelector(state => state.room);
     
     const { gameState, currentQuestion, sittingOutPlayer } = useSelector(state => state.game);
-    console.log('socket: ', socket);
 
     // useEffect(() => {
     //     socket.on('gameStateChange', ({ state }) => {
@@ -33,9 +32,7 @@ const GameLobby = ({ socket }) => {
         };
 
         const handleAssignQuestion = ({ username, question }) => {
-            console.log('Received assigned question:', username, question);
             if (username === userName) {
-                console.log('Matching username, dispatching action');
                 dispatch(setCurrentQuestion({ question }));
             }
             
@@ -55,6 +52,7 @@ const GameLobby = ({ socket }) => {
         // Emit 'startGame' message to Socket.IO
         // socket.emit('startGame', { /* data to be sent (optional) */ }); // Replace with relevant data if needed
         socket.emit('startGame', { roomCode: roomId });
+        
     };
 
     return(
