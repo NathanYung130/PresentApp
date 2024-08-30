@@ -30,16 +30,16 @@ const FibbageHandler = ({ socket }) => {
         //         dispatch(setCurrentQuestion({question}));
         //     }
         // };
-        // const handleAssignQuestion = ({ username, question }) => {
-        //     console.log('Received assigned question:', username, question);
-        //     if (username === userName) {
-        //         console.log('Matching username, dispatching action');
-        //         dispatch(setCurrentQuestion({ question }));
-        //     }
-        // };
+        const handleAssignQuestion = ({ username, question }) => {
+            console.log('Received assigned question:', username, question);
+            if (username === userName) {
+                console.log('Matching username, dispatching action');
+                dispatch(setCurrentQuestion({ question }));
+            }
+        };
 
        
-        // socket.on('assignedQuestion', handleAssignQuestion);
+        socket.on('assignedQuestion', handleAssignQuestion);
         socket.on('gameStateChange', handleGameStateChange);
 
         return () => {
