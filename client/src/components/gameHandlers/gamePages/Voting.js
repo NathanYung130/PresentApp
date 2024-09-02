@@ -84,7 +84,6 @@ const Voting = ({ question }) => {
 
         if (selectedOption.id === CorrectAnswer[0].id){
             //Selected Correctly, now Assign pts
-            alert('correct');
             setCorrect(true);
             //Award points to sitting out and player who guessed right
             handlePts({username: user, wonPts: 15});
