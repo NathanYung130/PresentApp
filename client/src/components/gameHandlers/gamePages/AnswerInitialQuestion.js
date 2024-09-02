@@ -48,7 +48,7 @@ const AnswerInitialQuestion = ({ question, userName, roomID }) => {
         {buttonTracker ?(
           <></>
         ):(
-          <button type="submit" onclick={handleSubmit}>Submit</button>
+          <button type="submit" onClick={handleSubmit}>Submit</button>
         )}
 
         {/* {form submit} */}

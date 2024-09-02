@@ -1,0 +1,95 @@
+/* Voting.module.css */
+.options-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 300px; /* Limit height for scroll */
+  overflow-y: auto;  /* Enable vertical scroll */
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  border: 2px solid #ddd;
+  margin-bottom: 10px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.radio-label:hover {
+  background-color: #f0f0f0;
+  border-color: #aaa;
+}
+
+input[type="radio"] {
+  display: none;
+}
+
+input[type="radio"]:checked + span {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.radio-label span {
+  display: block;
+  font-size: 1.1rem;
+}
+
+.submit-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #0056b3;
+}
+
+
+/* Voting.css */
+
+.feedback {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.checkmark, .cross {
+  font-size: 2rem;
+  animation: dropIn 0.5s ease-in-out;
+}
+
+@keyframes dropIn {
+  0% {
+      transform: translateY(-50px);
+      opacity: 0;
+  }
+  100% {
+      transform: translateY(0);
+      opacity: 1;
+  }
+}
+
+.checkmark {
+  color: green;
+}
+
+.cross {
+  color: rgb(255, 0, 0);
+}

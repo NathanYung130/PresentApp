@@ -37,14 +37,21 @@ button {
   }
 
 .logo{
-    margin: 0;
-    padding: 0;
+    /* margin: 0;
+    padding: 0; */
+    position: fixed; /* or absolute */
+    top: 4%; /* adjust to desired position */
+    left: 11%; /* adjust to desired position */
+    transform: translate(-50%, -50%); /* center the div */
+    z-index: 1; /* stack on top of other elements */
+    padding: 20px; /* add space around content */
+    margin: 0; /* remove default margin */
 }
 
 
 .gameDisp {
     width: 90vw;
-    height: 65vh;
+    height: 80vh;
     margin: 10px auto;
     padding: 1px;
     border: 10px solid #fcf8e8;
@@ -81,3 +88,31 @@ button {
     display: flex;
     flex-direction: column; 
 }
+
+
+
+
+/* Sleek Scrollbar */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background-color: #ffffff;
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: #918f8f;
+    border-radius: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #565656;
+  }
+  
+  ::-webkit-scrollbar-corner {
+    background-color: #1e1e1e;
+  }

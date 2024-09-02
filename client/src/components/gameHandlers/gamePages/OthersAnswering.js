@@ -21,7 +21,7 @@ const OthersAnswering = ({ question, socket }) => {
 
         const { data, error: insertError } = await supabase
         .from('question_answers')
-        .insert([{ roomcode: roomId, question: question, username: user, subAnswer: currInput}]);
+        .insert([{ roomcode: roomId, question: question, username: user, answer: currInput}]);
 
         
 
@@ -30,19 +30,31 @@ const OthersAnswering = ({ question, socket }) => {
     
 
     return (
-        <div className="game-screen">
-            <h3>Answer the Question!</h3>
-            <h2>{question}</h2>
-            {/* Form or input elements for submitting answers would go here */}
+        <>
+        {excludeMe ? (
+            <div className ="sittiingOutScreen"> 
+                <h1>Others Answering!</h1>
+                <h2> sit tight! </h2>
 
-            <input className = "roomcode__input" ref = { input }/>
-            {hideButton ? (
-                <></>
-            ) : (
-                <button onClick = { handleAnswer }> Answer </button>
-            )}
-            
-        </div>
+            </div>
+
+        ) : (
+
+            <div className="game-screen">
+                <h3>Answer the Question!</h3>
+                <h2>{question}</h2>
+
+                <input className = "roomcode__input" ref = { input }/>
+                {hideButton ? (
+                    <></>
+                ) : (
+                    <button onClick = { handleAnswer }> Answer </button>
+                )}
+
+            </div>
+
+        )}
+        </>
     );
 };
 
