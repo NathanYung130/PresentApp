@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setCurrentQuestion, setGameState, setQuestionMap } from '../../Redux/gameSlice';
 import AnswerInitialQuestion from './gamePages/AnswerInitialQuestion';
 import OthersAnswering from './gamePages/OthersAnswering';
-import Voting from './gamePages/OthersAnswering';
+import Voting from './gamePages/Voting';
 
 const FibbageHandler = ({ socket }) => {
     const dispatch = useDispatch();
@@ -22,14 +22,6 @@ const FibbageHandler = ({ socket }) => {
             }
         };
 
-        // const handleAssignQuestion = ({username, question }) => {
-        //     // socket.to(roomCode).emit('assignedQuestion', { username, question });
-        //     console.log('hello');
-        //     console.log(question);
-        //     if (username === userName) {
-        //         dispatch(setCurrentQuestion({question}));
-        //     }
-        // };
         const handleAssignQuestion = ({ username, question }) => {
             console.log('Received assigned question:', username, question);
             if (username === userName) {
@@ -56,8 +48,8 @@ const FibbageHandler = ({ socket }) => {
         const questionToDisplay = questionMap[sittingOutPlayer] || currentQuestion;
 
         switch (gameState) {
-          case 'answerInitialQuestion':
-            return <AnswerInitialQuestion question={currentQuestion} userName={userName} roomID={roomId} />;
+            case 'answerInitialQuestion':
+                return <AnswerInitialQuestion question={currentQuestion} userName={userName} roomID={roomId} />;
             case 'othersAnswering':
                 // Use question from the questionMap if sittingOutPlayer is defined
                 return sittingOutPlayer && questionMap[sittingOutPlayer] ? (
@@ -65,8 +57,8 @@ const FibbageHandler = ({ socket }) => {
                 ) : (
                   <OthersAnswering question="Default question or error message" />
                 );
-        //   case 'voting':
-        //     return <Voting answers={['took a shit at truck stop', 'said the n word', 'Green']} handleVote={(answer) => console.log(`Voted for: ${answer}`)} />;
+            case 'voting':
+                return <Voting question={questionToDisplay}/>;
         //   case 'sittingOut':
         //     return <SittingOut />;
         //    case 'leaderboard':
