@@ -4,6 +4,7 @@ import { setCurrentQuestion, setGameState, setQuestionMap } from '../../Redux/ga
 import AnswerInitialQuestion from './gamePages/AnswerInitialQuestion';
 import OthersAnswering from './gamePages/OthersAnswering';
 import Voting from './gamePages/Voting';
+import Leaderboard from './gamePages/Leaderboard';
 
 const FibbageHandler = ({ socket }) => {
     const dispatch = useDispatch();
@@ -59,10 +60,8 @@ const FibbageHandler = ({ socket }) => {
                 );
             case 'voting':
                 return <Voting question={questionToDisplay}/>;
-        //   case 'sittingOut':
-        //     return <SittingOut />;
-        //    case 'leaderboard':
-        //      return <Leaderboard players={players} />;
+           case 'leaderboard':
+             return <Leaderboard question={questionToDisplay} />;
            default:
             return <div>Unknown game state</div>;
         }
