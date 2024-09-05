@@ -49,7 +49,7 @@ const FibbageHandler = ({ socket }) => {
 
         switch (gameState) {
             case 'answerInitialQuestion':
-                return <AnswerInitialQuestion question={currentQuestion} userName={userName} roomID={roomId} />;
+                return <AnswerInitialQuestion question={currentQuestion} userName={userName} roomID={roomId} socket={socket} />;
             case 'othersAnswering':
                 // Use question from the questionMap if sittingOutPlayer is defined
                 return sittingOutPlayer && questionMap[sittingOutPlayer] ? (

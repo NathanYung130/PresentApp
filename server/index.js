@@ -18,6 +18,13 @@ const supabase = require('./supabaseClient');
 
 app.use(cors());
 const gameStates = ['answerInitialQuestion', 'othersAnswering', 'voting', 'leaderboard'];
+const getNextState = (currentState) => {
+    const states = ['answerInitialQuestion', 'othersAnswering', 'voting', 'leaderboard'];
+    const currentIndex = states.indexOf(currentState);
+    return states[(currentIndex + 1) % states.length];
+};
+const rooms = {}; // structure to store room data
+const games = {};
 
 socketIO.on('connection', (socket) => {
     console.log(`⚡: ${socket.id} user just connected!`);
@@ -102,6 +109,24 @@ socketIO.on('connection', (socket) => {
                 .eq('roomcode', socket.roomCode);
 
             if (fetchError) throw fetchError;
+
+
+            //get total players in room
+            if (!rooms[socket.roomCode]) {
+                rooms[socket.roomCode] = {
+                    totalPlayers : users.length,
+                    amsweredUsers: [],
+                }
+            }
+                //Set up the game state if it doesn't already exist
+                const totalPlayers = users.length;
+            if (!games[socket.roomCode]) {
+                games[socket.roomCode] = {
+                    answersSubmitted: 0,
+                    totalPlayers: rooms[socket.roomCode].totalPlayers, // Ensure this is correctly set
+                    gameState: 'answerInitialQuestion', // Set initial game state
+                };
+            }
 
 
 
@@ -259,6 +284,35 @@ socket.on('message', async (data) => {
             console.error('Error handling message:', error.message);
         }
 });
+
+//Moves to NEXT STATE after all users submit their answers
+socket.on('submitAnswer', (roomCode) => {
+    // Increment answer count for the room
+    games[roomCode].answersSubmitted += 1;
+    console.log('submitted answers',games[roomCode].answersSubmitted);
+    // Check if all players have submitted their answers
+    if (games[roomCode].answersSubmitted === games[roomCode].totalPlayers) {
+        // Reset answer count
+        games[roomCode].answersSubmitted = 0;
+        
+        // Move to the next game state
+        // [MAKE SURE that this game state is synced with the frontend. The change should be reflected in here
+        // when the gamestate changes regardless of how it is changed. might want to make another event that 
+        // updates the game state in the backend whenever it is changed in the fron end (maybe use a global veriable
+        //in change game state)]
+        games[roomCode].gameState = getNextState(games[roomCode].gameState);
+        
+        // Emit event to all clients in the room
+        // io.to(roomCode).emit('updateGameState', games[roomCode].gameState);
+        socketIO.to(roomCode).emit('updateGameState', games[roomCode].gameState);
+        console.log('Submit Answer activated',games);
+    }
+    console.log('Submit Answer activated (outside of loop )',games);
+});
+
+
+
+
 
 socket.on('disconnect', async () => {
   try {
