@@ -157,7 +157,7 @@ const Voting = ({ question }) => {
                             value={`option${index + 1}`} 
                             onChange={handleOptionChange}
                             />
-                            <span>{option.answer}</span> {/* Dynamically render option text */}
+                            <span>{option.answer}</span> 
                         </label>
                     ))}
                 </div>
