@@ -33,13 +33,16 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
   };
 
   const handleSubmit = async (event) => {
-    console.log('answer submitted --')
-    setButtonTracker(true);
     event.preventDefault();
-    await saveAnswerToSupabase(roomID, userName, question, answer);
-    // Emit event to server that user has answered
-    socket.emit('userAnswered', { roomCode: roomID, userName });
-    socket.emit('submitAnswer', roomID);
+    if(!buttonTracker) {
+      console.log('answer submitted --')
+      setButtonTracker(true);
+      event.preventDefault();
+      await saveAnswerToSupabase(roomID, userName, question, answer);
+      // Emit event to server that user has answered
+      socket.emit('userAnswered', { roomCode: roomID, userName });
+      socket.emit('submitAnswer', roomID);
+    }
   };
 
   const moveToNextState = () => {
