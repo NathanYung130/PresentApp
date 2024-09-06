@@ -12,6 +12,7 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
   const [isCountdownFinished, setIsCountdownFinished] = useState(false);
   const [gameStateUpdated, setGameStateUpdated] = useState(false);
   const saveAnswerToSupabase = async (roomCode, username, question, answer) => {
+    console.log('ANSWER IS BEING SUBMITTED');
     try {
       const { data, error } = await supabase.from('real_answers').insert([
         {
@@ -37,9 +38,17 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
     if(!buttonTracker) {
       console.log('answer submitted --')
       setButtonTracker(true);
-      event.preventDefault();
       await saveAnswerToSupabase(roomID, userName, question, answer);
       // Emit event to server that user has answered
+
+    // Prevent duplicate submissions
+    if (!buttonTracker) {
+      console.log('ANSWER IS BEING SUBMITTED');
+      setButtonTracker(true);  // Track that the button has been clicked
+
+      await saveAnswerToSupabase(roomID, userName, question, answer);
+
+      // Emit events to server after answering
       socket.emit('userAnswered', { roomCode: roomID, userName });
       socket.emit('submitAnswer', roomID);
     }
@@ -75,7 +84,7 @@ useEffect(() => {
     <div className="game-screen">
         <h2>Question:</h2>
         <p>{question}</p>
-        <form onSubmit={handleSubmit}>
+        <form>
         <label>
           <input type="text" className="username__input" value={answer} onChange={(event) => setAnswer(event.target.value)} />
         </label>
@@ -88,7 +97,7 @@ useEffect(() => {
         {/* {form submit} */}
         </form>
         <div className="progress-bar-container">
-        <CountProgressBar duration={50000} onComplete={() => setIsCountdownFinished(true)} /></div>
+        <CountProgressBar duration={10000} onComplete={() => setIsCountdownFinished(true)} /></div>
     </div>
   );
 };
