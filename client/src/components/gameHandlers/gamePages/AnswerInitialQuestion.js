@@ -35,11 +35,6 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if(!buttonTracker) {
-      console.log('answer submitted --')
-      setButtonTracker(true);
-      await saveAnswerToSupabase(roomID, userName, question, answer);
-      // Emit event to server that user has answered
 
     // Prevent duplicate submissions
     if (!buttonTracker) {
