@@ -1,13 +1,16 @@
 import React from 'react';
-import { useRef, useState } from 'react';
+import { useRef, useEffect,  useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import supabase from '../../../supabaseClient';
+import CountProgressBar from '../../ProgressBar';
 
 
-
-const OthersAnswering = ({ question, socket }) => {
+const OthersAnswering = ({ question, roomID, socket }) => {
     const input = useRef(null);
     const [ hideButton, setHideButton ]= useState(false);
+    const [buttonTracker, setButtonTracker ]= useState(false);// button has been pressed or not (used to prevent double submit)
+    const [isCountdownFinished, setIsCountdownFinished] = useState(false);// countdown timer is finished
+    const [gameStateUpdated, setGameStateUpdated] = useState(false); // game state has been updated or not
 
     const user = useSelector((state) => state.room.userName);
     const roomId = useSelector((state) => state.room.roomId);
@@ -15,19 +18,56 @@ const OthersAnswering = ({ question, socket }) => {
     const currQuestion = useSelector((state) => state.game.currentQuestion);
     const excludeMe = user === sitOut;
 
-    const handleAnswer = async() => {
-        setHideButton(true);
-        const currInput = input.current.value;
+    const handleAnswer = async(event) => {
 
-        const { data, error: insertError } = await supabase
-        .from('question_answers')
-        .insert([{ roomcode: roomId, question: question, username: user, answer: currInput}]);
+        event.preventDefault();
+        if (!buttonTracker) {
+            setHideButton(true);
+            
+            const currInput = input.current.value;
 
+            const { data, error: insertError } = await supabase
+            .from('question_answers')
+            .insert([{ roomcode: roomId, question: question, username: user, answer: currInput}]);
+
+            socket.emit('submitAnswer', roomID);
+            //setButtonTracker(true);  // Track that the button has been clicked
+
+        }
+        
         
 
     }
 
-    
+    // moves to next state
+    const moveToNextState = () => {
+        socket.emit('nextGameState', { roomCode: roomID });
+    };
+
+    // changes screens if timer is done
+    useEffect(() => {
+        socket.on('updateGameState', (newGameState) => {
+          console.log('Game state updated:', newGameState);
+          setGameStateUpdated(true);
+        });
+      
+        console.log('updated game state true or false: ', gameStateUpdated);
+        // if (isCountdownFinished && !buttonTracker) {
+        if ((isCountdownFinished) || (gameStateUpdated === true)) {
+          console.log('countdown finished or everyone has alredy answered');
+          handleAnswer(new Event('Answer')); // Triggers submit and next state
+          moveToNextState();
+        }
+      
+        // Clean up event listener when component unmounts
+        return () => {
+          socket.off('updateGameState');
+        };
+      }, [isCountdownFinished, buttonTracker, gameStateUpdated]); // Only run when countdown finishes
+
+    const submitForSittingOut = () => {
+        socket.emit('submitAnswer', roomID);
+    }
 
     return (
         <>
@@ -35,7 +75,7 @@ const OthersAnswering = ({ question, socket }) => {
             <div className ="sittiingOutScreen"> 
                 <h1>Others Answering!</h1>
                 <h2> sit tight! </h2>
-
+                {submitForSittingOut}
             </div>
 
         ) : (
@@ -54,6 +94,9 @@ const OthersAnswering = ({ question, socket }) => {
             </div>
 
         )}
+        <div className="progress-bar-container">
+        <CountProgressBar duration={10000} onComplete={() => setIsCountdownFinished(true)} /></div>
+        
         </>
     );
 };

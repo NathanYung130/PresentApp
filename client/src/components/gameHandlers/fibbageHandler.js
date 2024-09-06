@@ -54,7 +54,7 @@ const FibbageHandler = ({ socket }) => {
             case 'othersAnswering':
                 // Use question from the questionMap if sittingOutPlayer is defined
                 return sittingOutPlayer && questionMap[sittingOutPlayer] ? (
-                  <OthersAnswering question={questionToDisplay} />
+                    <OthersAnswering question={questionToDisplay} roomID={roomId} socket={socket}/>
                 ) : (
                   <OthersAnswering question="Default question or error message" />
                 );
