@@ -44,7 +44,7 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
       await saveAnswerToSupabase(roomID, userName, question, answer);
 
       // Emit events to server after answering
-      socket.emit('userAnswered', { roomCode: roomID, userName });
+      // socket.emit('userAnswered', { roomCode: roomID, userName });
       socket.emit('submitAnswer', roomID);
     }
   };

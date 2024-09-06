@@ -6,7 +6,7 @@ import CountProgressBar from '../../ProgressBar';
 
 
 const OthersAnswering = ({ question, roomID, socket }) => {
-    const input = useRef(null);
+    const input = useRef(false);
     const [ hideButton, setHideButton ]= useState(false);
     const [buttonTracker, setButtonTracker ]= useState(false);// button has been pressed or not (used to prevent double submit)
     const [isCountdownFinished, setIsCountdownFinished] = useState(false);// countdown timer is finished
@@ -19,25 +19,32 @@ const OthersAnswering = ({ question, roomID, socket }) => {
     const excludeMe = user === sitOut;
 
     const handleAnswer = async(event) => {
-
-        event.preventDefault();
+        console.log('HandleAnswer called');
+        console.log(input,'inpuit --- >>  ||| Input Current value ====', input.current.value)
+        event && event.preventDefault(); // Prevent form submission
         if (!buttonTracker) {
+
             setHideButton(true);
+            setButtonTracker(true); // Ensure answer is only submitted once
             
             const currInput = input.current.value;
 
-            const { data, error: insertError } = await supabase
-            .from('question_answers')
-            .insert([{ roomcode: roomId, question: question, username: user, answer: currInput}]);
+            if (currInput) {
+                const { data, error: insertError } = await supabase
+                    .from('question_answers')
+                    .insert([{ roomcode: roomId, question: question, username: user, answer: currInput }]);
+
+                if (insertError) {
+                    console.error("Error saving answer to Supabase:", insertError);
+                } else {
+                    console.log("Answer saved to Supabase:", data);
+                }
+            }
 
             socket.emit('submitAnswer', roomID);
-            //setButtonTracker(true);  // Track that the button has been clicked
-
+        
         }
-        
-        
-
-    }
+    };
 
     // moves to next state
     const moveToNextState = () => {
@@ -53,7 +60,7 @@ const OthersAnswering = ({ question, roomID, socket }) => {
       
         console.log('updated game state true or false: ', gameStateUpdated);
         // if (isCountdownFinished && !buttonTracker) {
-        if ((isCountdownFinished) || (gameStateUpdated === true)) {
+        if (((isCountdownFinished) || (gameStateUpdated === true)) && (!excludeMe)) {
           console.log('countdown finished or everyone has alredy answered');
           handleAnswer(new Event('Answer')); // Triggers submit and next state
           moveToNextState();
