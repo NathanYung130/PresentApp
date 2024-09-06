@@ -353,6 +353,33 @@ socket.on('disconnect', async () => {
 
           if (deleteGameSessionError) throw deleteGameSessionError;
 
+            // Delete all rows of question_answers from db
+            const { error: deleteQuestionAnswers} = await supabase
+                .from('question_answers')
+                .delete()
+                .eq('roomcode', roomCode);
+
+            if (deleteQuestionAnswers) throw deleteQuestionAnswers;
+
+            // Delete all rows of score_tracker from db
+            const { error: deleteRealAnswers} = await supabase
+                .from('real_answers')
+                .delete()
+                .eq('roomcode', roomCode);
+
+            if (deleteRealAnswers) throw deleteRealAnswers;
+
+            // Delete all rows of score_tracker from db
+            const { error: deleteScoreError} = await supabase
+                .from('score_tracker')
+                .delete()
+                .eq('roomcode', roomCode);
+
+            if (deleteScoreError) throw deleteScoreError;
+
+
+            
+
           console.log(`Deleted game session for room: ${roomCode}`);
       }
 
