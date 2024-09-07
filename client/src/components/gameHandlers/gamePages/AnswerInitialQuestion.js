@@ -34,7 +34,7 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    // event.preventDefault();
 
     // Prevent duplicate submissions
     if (!buttonTracker) {
@@ -50,21 +50,26 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
   };
 
   const moveToNextState = () => {
-    socket.emit('nextGameState', { roomCode: roomID });
+    if (!gameStateUpdated) {
+      setGameStateUpdated(true);  
+      socket.emit('nextGameState', { roomCode: roomID });
+  }
   };
 
 
 useEffect(() => {
-  socket.on('updateGameState', (newGameState) => {
+  const handleGameStateChange = (newGameState) => {
     console.log('Game state updated:', newGameState);
     setGameStateUpdated(true);
-  });
+  };
+
+  socket.on('updateGameState', handleGameStateChange);
 
   console.log('updated game state true or false: ', gameStateUpdated);
   // if (isCountdownFinished && !buttonTracker) {
   if ((isCountdownFinished) || (gameStateUpdated === true)) {
     console.log('countdown finished or everyone has alredy answered');
-    handleSubmit(new Event('submit')); // Triggers submit and next state
+    handleSubmit(); // Triggers submit and next state
     moveToNextState();
   }
 

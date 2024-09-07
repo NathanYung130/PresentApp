@@ -48,21 +48,27 @@ const OthersAnswering = ({ question, roomID, socket }) => {
 
     // moves to next state
     const moveToNextState = () => {
-        socket.emit('nextGameState', { roomCode: roomID });
+        if (!gameStateUpdated) {
+            setGameStateUpdated(true);  
+            socket.emit('nextGameState', { roomCode: roomID });
+        }
     };
 
     // changes screens if timer is done
     useEffect(() => {
-        socket.on('updateGameState', (newGameState) => {
-          console.log('Game state updated:', newGameState);
-          setGameStateUpdated(true);
-        });
+        const handleGameStateChange = (newGameState) => {
+            console.log('Game state updated:', newGameState);
+            setGameStateUpdated(true);
+          };
+        
+          socket.on('updateGameState', handleGameStateChange);
       
         console.log('updated game state true or false: ', gameStateUpdated);
         // if (isCountdownFinished && !buttonTracker) {
         if (((isCountdownFinished) || (gameStateUpdated === true)) && (!excludeMe)) {
-          console.log('countdown finished or everyone has alredy answered');
+          console.log('countdown finished or everyone has alredy answered (in Others Answering)');
           handleAnswer(new Event('Answer')); // Triggers submit and next state
+          submitForSittingOut();
           moveToNextState();
         }
       
@@ -70,7 +76,7 @@ const OthersAnswering = ({ question, roomID, socket }) => {
         return () => {
           socket.off('updateGameState');
         };
-      }, [isCountdownFinished, buttonTracker, gameStateUpdated]); // Only run when countdown finishes
+      }, [isCountdownFinished, buttonTracker, gameStateUpdated, excludeMe]); // Only run when countdown finishes
 
     const submitForSittingOut = () => {
         socket.emit('submitAnswer', roomID);
