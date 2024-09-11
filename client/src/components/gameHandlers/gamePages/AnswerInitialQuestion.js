@@ -82,6 +82,8 @@ useEffect(() => {
 
   return (
     <div className="game-screen">
+      <div className="progress-circle-container">
+        <CountProgressBar duration={10000} onComplete={() => setIsCountdownFinished(true)} /></div>
         <h2>Question:</h2>
         <p>{question}</p>
         <form>
@@ -96,8 +98,7 @@ useEffect(() => {
 
         {/* {form submit} */}
         </form>
-        <div className="progress-bar-container">
-        <CountProgressBar duration={10000} onComplete={() => setIsCountdownFinished(true)} /></div>
+        
     </div>
   );
 };

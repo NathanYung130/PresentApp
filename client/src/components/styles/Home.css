@@ -172,3 +172,26 @@ label {
     background-color: #180161;
     border-radius: 5px;
 }
+.progress-circle-container {
+    position: fixed;
+    top: 10vh;
+    right: 10vh;
+    z-index: 1000;
+}
+
+.progress-circle {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.progress-circle-bg {
+    fill: none;
+    stroke: #ccc;
+}
+
+.progress-circle-fill {
+    fill: none;
+    stroke: #180161;
+    transition: stroke-dashoffset 0.5s ease;
+}
