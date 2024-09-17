@@ -1,0 +1,35 @@
+/* .game-screen{
+    display: flex;
+    flex-direction: column;
+}
+ */
+
+ .question_title{
+    margin-bottom: 10px;  /* Reduce bottom margin */
+ }
+.Question{
+    margin-bottom: 150px;  /* Reduce bottom margin */
+}
+ .game-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column; /* Ensures elements stack vertically */
+    text-align: center;
+  }
+  
+  .initial_question_input {
+    width: 40%; /* Adjusts the width of the input */
+    height: 50px; /* Adjusts the height of the input */
+    font-size: 18px; /* Makes the text inside bigger */
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Adds shadow for depth */
+    margin-bottom: 20px; /* Adds space between input and the button */
+    position: absolute; /* You can also use 'fixed' if you want it to stay centered even when scrolling */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+  }

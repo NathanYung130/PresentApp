@@ -1,5 +1,6 @@
 .chat__sidebar {
     width: 250px;
+    left: 0;
     background-color: #333;
     color: #fff;
     padding: 20px;
@@ -49,7 +50,7 @@ p {
 
 .chat__sidebar {
     position: absolute;
-    width: 150px;
+    width: 120px;
     background-color: #333;
     color: #fff;
     padding: 20px;
