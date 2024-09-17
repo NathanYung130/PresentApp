@@ -36,10 +36,10 @@ const Home = ({ socket }) => {
             return; // Prevent form submission if validation fails
         } else if(userName.length < 1){
             handlePopup('userNameError');
+        } else{
+            updateStores();
+            socket.emit('queryRoom', { userName, roomCode});
         }
-        updateStores();
-        socket.emit('queryRoom', { userName, roomCode});
-
     };
 
     // Handle creation of room. emits to socket to check, the socket response
@@ -48,13 +48,13 @@ const Home = ({ socket }) => {
         if (userName.length < 1) {
             handlePopup('userNameError');
             return; // Prevent form submission if validation fails
+        } else{
+            setCreateState(true);
+            let TempId = nanoid(6);
+            setRoomCode(TempId);
+            updateStores();
+            socket.emit('queryRoom', { userName, roomCode});
         }
-        setCreateState(true);
-        let TempId = nanoid(6);
-        setRoomCode(TempId);
-        updateStores();
-        socket.emit('queryRoom', { userName, roomCode});
-
     };
 
     // useEffect handles the output of listener functions that pull from socket.io
@@ -63,14 +63,15 @@ const Home = ({ socket }) => {
             if (createState){
 
                 updateStores();
-                socket.emit('joinRoom', { userName, roomCode, socketID: socket.id });
+                socket.emit('joinRoom', { userName, roomCode, socketID: socket.id, firstUser: 1 });
+                // socket.emit('createRoom', { userName, roomCode, socketID: socket.id });
                 navigate(`/chat/${roomCode}`);
             }else{
                 handlePopup('noRoom');
             }
         };
         const handleRoomFound = () => {
-            socket.emit('joinRoom', { userName, roomCode, socketID: socket.id });
+            socket.emit('joinRoom', { userName, roomCode, socketID: socket.id, firstUser: 0 });
             navigate(`/chat/${roomCode}`);
         };
 

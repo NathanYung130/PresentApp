@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import GameLobby from './GameLobby';
 import FibbageHandler from './fibbageHandler';
 
+import '../../components/styles/ChatPage.css'
+
 const GameDisplay = ({ socket }) => {
     const gameStart = useSelector((state) => state.game.gameStarted);
     

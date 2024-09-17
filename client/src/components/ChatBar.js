@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
 
+import { nanoid } from 'nanoid';
+
 import styles from './styles/ChatBar.css'
 
 const ChatBar = ({ socket }) => {
@@ -13,7 +15,10 @@ const ChatBar = ({ socket }) => {
 
   useEffect(() => {
     socket.on('newUserResponse', (data) => setUsers(data));
-  }, [socket, users]);
+    return () => {
+      socket.off('newUserResponse');
+    };
+  }, [socket]);
   
   const handleLeaveChat = () => {
     //update Redux store with roomId
@@ -35,7 +40,8 @@ const ChatBar = ({ socket }) => {
           <h4 className="chat__header">ACTIVE USERS</h4>
           <div className="chat__users">
             {users.map((user) => (
-              <p key={user.socketID}>{user.username}</p>
+              // <p key={user.socketID}>{user.username}</p>
+              <p key={nanoid(8)}>{user.username}</p>
             ))}
           </div>
           <h4> Room: </h4>

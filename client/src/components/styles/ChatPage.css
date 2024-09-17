@@ -40,8 +40,8 @@ button {
     /* margin: 0;
     padding: 0; */
     position: fixed; /* or absolute */
-    top: 4%; /* adjust to desired position */
-    left: 11%; /* adjust to desired position */
+    top: 3%; /* adjust to desired position */
+    left: 10%; /* adjust to desired position */
     transform: translate(-50%, -50%); /* center the div */
     z-index: 1; /* stack on top of other elements */
     padding: 20px; /* add space around content */
@@ -65,6 +65,15 @@ button {
     text-align: center;
     font-weight: bold;
     color: #918e8e;
+}
+
+.lobby {
+  display: flex;
+  flex-direction: column;
+  width: 70vw;
+  height: 80vh;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
 }
 
 /* Add some hover effect to make it more interactive */
@@ -115,4 +124,9 @@ button {
   
   ::-webkit-scrollbar-corner {
     background-color: #1e1e1e;
+  }
+
+  h1 {
+    margin-top: 10px;  /* Reduce top margin */
+    margin-bottom: 10px;  /* Reduce bottom margin */
   }

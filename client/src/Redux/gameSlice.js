@@ -1,85 +1,3 @@
-// import { createSlice } from '@reduxjs/toolkit';
-
-// const initialState = {
-//   gameStarted: false,
-//   gameData: null,
-//   sittingOutPlayer: null,
-//   playersWhoSatOut: [],
-// };
-
-// const gameSlice = createSlice({
-//   name: 'game',
-//   initialState,
-//   reducers: {
-//     startGame: (state, action) => {
-//       return { ...state, gameStarted: true}
-//     },
-//     resetGame: (state, action) => {
-//       return { ...state, gameStarted: false}
-//       /*
-//       state.gameStarted = false;
-//       state.gameData = null;
-//       */
-//     },
-//     setGameState: (state, action) => {
-//       state.gameState = action.payload.state;
-//       state.sittingOutPlayer = action.payload.sittingOutPlayer;
-//       state.gameStarted = true;
-//     },
-//     updatePlayersWhoSatOut: (state, action) => {
-//       state.playersWhoSatOut = action.payload;
-//     },
-//   },
-// });
-
-// export const { startGame, resetGame, setGameState, updatePlayersWhoSatOut } = gameSlice.actions;
-// export default gameSlice.reducer;
-
-
-
-
-
-
-
-
-// import { createSlice } from '@reduxjs/toolkit';
-
-// const initialState = {
-//   gameStarted: false,
-//   gameState: null,
-//   sittingOutPlayer: null,
-//   playersWhoSatOut: [],
-// };
-
-// const gameSlice = createSlice({
-//   name: 'game',
-//   initialState,
-//   reducers: {
-//     startGame: (state) => {
-//       state.gameStarted = true;
-//       state.gameState = 'answerInitialQuestion'; // Set initial game state
-//     },
-//     resetGame: (state) => {
-//       state.gameStarted = false;
-//       state.gameState = null;
-//       state.sittingOutPlayer = null;
-//       state.playersWhoSatOut = [];
-//     },
-//     setGameState: (state, action) => {
-//       state.gameState = action.payload.state;
-//       state.sittingOutPlayer = action.payload.sittingOutPlayer;
-//       state.gameStarted = true; // This assumes gameState change implies game is ongoing
-//     },
-//     updatePlayersWhoSatOut: (state, action) => {
-//       state.playersWhoSatOut = action.payload;
-//     },
-//   },
-// });
-
-// export const { startGame, resetGame, setGameState, updatePlayersWhoSatOut } = gameSlice.actions;
-// export default gameSlice.reducer;
-
-
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -87,6 +5,8 @@ const initialState = {
   gameData: null,
   gameState: null,
   sittingOutPlayer: null,
+  gameAdmin: null,
+  gameWinner: null,
   playersWhoSatOut: [],
   currentQuestion: '',
   questionMap: {}, // To store username to question mapping
@@ -113,6 +33,14 @@ const gameSlice = createSlice({
         sittingOutPlayer: action.payload.sittingOutPlayer,
         gameStarted: true
       };
+    },
+    setGameAdmin: (state, action) => {
+      // Return username of the current game admin
+      return { ...state, gameAdmin: action.payload};
+    },
+    setGameWinner: (state, action) => {
+      // Return game winner
+      return { ...state, gameWinner: action.payload};
     },
     updatePlayersWhoSatOut: (state, action) => {
       // Return updated state with new list of players who sat out
@@ -145,5 +73,5 @@ const gameSlice = createSlice({
   },
 });
 
-export const { startGame, resetGame, setGameState, updatePlayersWhoSatOut, setCurrentQuestion, setQuestionMap, setCurrentPlayerIndex, getNextQuestion } = gameSlice.actions;
+export const { startGame, resetGame, setGameState, setGameAdmin, setGameWinner, updatePlayersWhoSatOut, setCurrentQuestion, setQuestionMap, setCurrentPlayerIndex, getNextQuestion } = gameSlice.actions;
 export default gameSlice.reducer;

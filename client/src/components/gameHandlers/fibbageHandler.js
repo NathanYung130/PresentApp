@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setCurrentQuestion, setGameState, setQuestionMap } from '../../Redux/gameSlice';
+import { setCurrentQuestion, setGameState, setQuestionMap, setGameAdmin } from '../../Redux/gameSlice';
 import AnswerInitialQuestion from './gamePages/AnswerInitialQuestion';
 import OthersAnswering from './gamePages/OthersAnswering';
 import Voting from './gamePages/Voting';
 import Leaderboard from './gamePages/Leaderboard';
+import EndGame from './gamePages/EndGame';
+import supabase from '../../supabaseClient';
+import CountProgressBar from '../ProgressBar';
 
 const FibbageHandler = ({ socket }) => {
     const dispatch = useDispatch();
@@ -31,7 +34,30 @@ const FibbageHandler = ({ socket }) => {
             }
         };
 
+        const getAdminStatus = async () => {
+            
+            const {data: adminBool, error: adminBoolError} = await supabase
+                .from('room_users')
+                .select('*')
+                .eq('roomcode', roomId)
+                .eq('admin', 1);
+    
+            if (adminBoolError){
+                console.log('Error fetching admin status');
+                // dispatch(setGameAdmin(adminBool[0].username));
+            }else {
+                console.log('Admin = ', adminBool[0].username);
+                if (adminBool[0].username === userName){
+                    dispatch(setGameAdmin(true));
+                }else{
+                    dispatch(setGameAdmin(false));
+                }
+
+            }
+        };
+
        
+        getAdminStatus();
         socket.on('assignedQuestion', handleAssignQuestion);
         socket.on('gameStateChange', handleGameStateChange);
 
@@ -48,6 +74,7 @@ const FibbageHandler = ({ socket }) => {
         //question that is going to be displayed in (others answering)
         const questionToDisplay = questionMap[sittingOutPlayer] || currentQuestion;
 
+        console.log('gameState: ', gameState);
         switch (gameState) {
             case 'answerInitialQuestion':
                 return <AnswerInitialQuestion question={currentQuestion} userName={userName} roomID={roomId} socket={socket} />;
@@ -59,14 +86,15 @@ const FibbageHandler = ({ socket }) => {
                   <OthersAnswering question="Default question or error message" />
                 );
             case 'voting':
-                return <Voting question={questionToDisplay}/>;
-           case 'leaderboard':
-             return <Leaderboard question={questionToDisplay} />;
+                return <Voting question={questionToDisplay} socket={socket}/>;
+            case 'leaderboard':
+                return <Leaderboard question={questionToDisplay} socket={socket} inSession = {true}/>;
+            case 'endGame':
+                return <EndGame />
            default:
             return <div>Unknown game state</div>;
         }
 
-        console.log(gameState);
       };
 
     const handleNextState = () => {
@@ -75,17 +103,18 @@ const FibbageHandler = ({ socket }) => {
         }
     };
 
+
     return (
         <>
-            <h1>Fibbage!</h1>
+            {/* <h1>Fibbage!</h1> */}
             {renderGameComponent()}
-            <h2>Current Game State: {gameState}</h2>
-            {!gameEnded && <button onClick={ handleNextState }>Next State</button>}
-            {gameEnded && <p>Game has ended!</p>}
+            {/* <h2>Current Game State: {gameState}</h2>
+            {!gameEnded && <button onClick={ handleNextState }>Next State</button>} */}
+            {/* {gameEnded && <p>Game has ended!</p>}
 
             {sittingOutPlayer && <p>Sitting Out Player: {sittingOutPlayer}</p>}
-            {/* {!gameEnded && <button onClick={handleNextState}>Next State (Test)</button>} */}
-            {gameEnded && <p>Game has ended!</p>}
+            {gameEnded && <p>Game has ended!</p>} */}
+
         </>
     );
 };

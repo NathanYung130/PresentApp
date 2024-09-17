@@ -1,105 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import  supabase  from '../../../supabaseClient';
+import React, { useState, useRef, useEffect } from 'react';
+import supabase from '../../../supabaseClient';
 import CountProgressBar from '../../ProgressBar';
-//get from supabase same amount of questions as participating players
-//assign a question per player, store question in redux
-// this question needs to be displayed to other players in following rounds
+import { useSelector } from 'react-redux';
 
-// 
+import '../../styles/AnswerInitial.css';
+
 const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
-  const [buttonTracker, setButtonTracker ]= useState(false);
-  const [answer, setAnswer] = useState('');
-  const [isCountdownFinished, setIsCountdownFinished] = useState(false);
-  const [gameStateUpdated, setGameStateUpdated] = useState(false);
-  const saveAnswerToSupabase = async (roomCode, username, question, answer) => {
-    console.log('ANSWER IS BEING SUBMITTED');
-    try {
-      const { data, error } = await supabase.from('real_answers').insert([
-        {
-          roomcode: roomCode,
-          username: username,
-          question: question,
-          answer: answer,
-        },
-      ]);
+  const adminState = useSelector((state) => state.game.gameAdmin);
+  const answerRef = useRef('');
+  const emitted = useRef(false);
+  // Timer Handler Dependencies
+  const onCompleteCall = useRef(false);
+  const toStore = useRef(false);
+  const [submit, setSubmit] = useState(false);
 
-      if (error) {
-        console.error('Error saving answer to Supabase:', error);
-      } else {
-        console.log('Answer saved to Supabase:', data);
-      }
-    } catch (error) {
-      console.error('Unexpected error:', error);
-    }
-  };
-
+  //Handles all submission
   const handleSubmit = async (event) => {
-    // event.preventDefault();
+    if (event) event.preventDefault();
 
-    // Prevent duplicate submissions
-    if (!buttonTracker) {
-      console.log('ANSWER IS BEING SUBMITTED');
-      setButtonTracker(true);  // Track that the button has been clicked
+    //Double Submit protection
+    if (!submit) {
+      setSubmit(true);
 
-      await saveAnswerToSupabase(roomID, userName, question, answer);
+      if (!toStore.current) {
+        toStore.current = true;
+        console.log('submitting to store');
+        const { error: insertError } = await supabase
+          .from('real_answers')
+          .insert([{ roomcode: roomID, username: userName, question: question, answer: answerRef.current }]);
 
-      // Emit events to server after answering
-      // socket.emit('userAnswered', { roomCode: roomID, userName });
-      socket.emit('submitAnswer', roomID);
+        if (insertError) {
+          console.error('Error saving answer to Supabase:', insertError);
+        }
+      }
+
+      if (!emitted.current){
+        socket.emit('submitAnswer', roomID);
+        emitted.current = true;
+      }
     }
   };
 
-  const moveToNextState = () => {
-    if (!gameStateUpdated) {
-      setGameStateUpdated(true);  
+  // ========Timer Auto Submission Code =================//
+  // ----------------------------------------------------//
+  const timerHandler = () => {
+    console.log('Timer Up!');
+    if (onCompleteCall.current) return;
+    onCompleteCall.current = true;
+
+    if (!submit) {
+      handleSubmit(); 
+    }
+
+  };
+
+  //Listen for next state calls
+  useEffect(() => {
+    const handleGameStateChange = () => {
       socket.emit('nextGameState', { roomCode: roomID });
-  }
-  };
+      console.log('emit state change!');
+    };
 
+    if(adminState){
+      socket.on('updateGameState', handleGameStateChange);
+    };
 
-useEffect(() => {
-  const handleGameStateChange = (newGameState) => {
-    console.log('Game state updated:', newGameState);
-    setGameStateUpdated(true);
-  };
-
-  socket.on('updateGameState', handleGameStateChange);
-
-  console.log('updated game state true or false: ', gameStateUpdated);
-  // if (isCountdownFinished && !buttonTracker) {
-  if ((isCountdownFinished) || (gameStateUpdated === true)) {
-    console.log('countdown finished or everyone has alredy answered');
-    handleSubmit(); // Triggers submit and next state
-    moveToNextState();
-  }
-
-  // Clean up event listener when component unmounts
-  return () => {
-    socket.off('updateGameState');
-  };
-}, [isCountdownFinished, buttonTracker, gameStateUpdated]); // Only run when countdown finishes
-  
-
+    return () => {
+      socket.off('updateGameState');
+    };
+  }, [roomID, socket, adminState]);
+// ========================================================//
+// --------------------------------------------------------//
   return (
     <div className="game-screen">
-        <h2>Question:</h2>
-        <p>{question}</p>
-        <form>
+      <h2 className = "question_title">Question:</h2>
+      <p className = "Question">{question}</p>
+      <form onSubmit={handleSubmit}>
         <label>
-          <input type="text" className="username__input" value={answer} onChange={(event) => setAnswer(event.target.value)} />
-        </label>
-        {buttonTracker ?(
-          <></>
-        ):(
-          <button type="submit" onClick={handleSubmit}>Submit</button>
-        )}
+          <input
+            type="text"
+            className="initial_question_input"
+            defaultValue={answerRef.current}
+            onChange={(event) => (answerRef.current = event.target.value)}
+            required
+          />
+          <div className="progress-circle-container">
+          <CountProgressBar duration={20000} onComplete={timerHandler} />
 
-        {/* {form submit} */}
-        </form>
-        <div className="progress-bar-container">
-        <CountProgressBar duration={10000} onComplete={() => setIsCountdownFinished(true)} /></div>
+          </div>
+        </label>
+        {!submit && (
+          <button type="submit">Submit</button>
+        )}
+      </form>
+
     </div>
   );
 };
 
 export default AnswerInitialQuestion;
+

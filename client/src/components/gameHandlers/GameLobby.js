@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { startGame } from '../../Redux/gameSlice';
+import { startGame, setGameAdmin } from '../../Redux/gameSlice';
 //import { useSelector } from 'react-redux'
 import { setCurrentQuestion, setQuestionMap } from '../../Redux/gameSlice';
 
@@ -8,7 +8,7 @@ import { setCurrentQuestion, setQuestionMap } from '../../Redux/gameSlice';
 const GameLobby = ({ socket }) => {
     const dispatch = useDispatch();
     const { roomId } = useSelector(state => state.room);
-    const { userName} = useSelector(state => state.room);
+    const { userName } = useSelector(state => state.room);
     
 
 
@@ -18,7 +18,6 @@ const GameLobby = ({ socket }) => {
             if (state === 'answerInitialQuestion') {
                 dispatch(startGame());
             }
-
         
         };
 
@@ -31,15 +30,11 @@ const GameLobby = ({ socket }) => {
                 console.log('username unmatched');
             }
             
-            
             dispatch(setQuestionMap({ [username]: question }));
-
-
-            
         };
 
         socket.on('assignedQuestion', handleAssignQuestion);
-
+    
     socket.on('gameStateChange', handleGameStateChange);
 
     return () => {
@@ -61,6 +56,9 @@ const GameLobby = ({ socket }) => {
             <h2> Welcome to the Lobby! </h2>
             <h1> Hit start when all members are here! </h1>
             <button className="gameStart_btn" onClick={handleGameStart}>START GAME</button>
+            <h2>Fibbage Rules: </h2>
+            <p>- First everyone is prompted to answer a question about themselves</p>
+            <p>- </p>
         </div>
         </>
     );

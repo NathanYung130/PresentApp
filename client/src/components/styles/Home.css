@@ -172,3 +172,30 @@ label {
     background-color: #180161;
     border-radius: 5px;
 }
+
+
+/* Code for progress circle*/
+
+.progress-circle-container {
+    position: fixed;
+    top: 11vh;
+    right: 6vw;
+    z-index: 1000;
+}
+
+.progress-circle {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+}
+
+.progress-circle-bg {
+    fill: none;
+    stroke: #ccc;
+}
+
+.progress-circle-fill {
+    fill: none;
+    stroke: #180161;
+    transition: stroke-dashoffset 0.5s ease;
+}

@@ -52,7 +52,10 @@ socketIO.on('connection', (socket) => {
         return;
     });
 
-    socket.on('joinRoom', async ({ userName, roomCode }) => {
+    socket.on('joinRoom', async ({ userName, roomCode, firstUser }) => {
+        console.log('userName: ', userName);
+        console.log('roomCode: ', roomCode);
+        console.log('firstUser: ', firstUser);
         try {
             // Use a transaction to ensure atomicity
             const { data: room, error: roomFetchError } = await supabase
@@ -64,13 +67,15 @@ socketIO.on('connection', (socket) => {
                 throw roomFetchError;
             }
 
+            //Subscribe to room changes
             socket.join(roomCode);
             socket.roomCode = roomCode;
 
+            //Insert new user into database
             console.log('Adding to store', socket.id);
             const { error: insertError } = await supabase
                 .from('room_users')
-                .insert([{ username: userName, roomcode: roomCode, socketid: socket.id }]);
+                .insert([{ username: userName, roomcode: roomCode, socketid: socket.id, admin: firstUser }]);
 
             if (insertError) throw insertError;
 
@@ -99,6 +104,8 @@ socketIO.on('connection', (socket) => {
         //Broadcast to all users that game has started
         socketIO.to(roomCode).emit('gameStarted');
     });
+
+
 
     socket.on('startGame', async () => {
         try {
@@ -156,11 +163,6 @@ socketIO.on('connection', (socket) => {
             //   console.log('username: ', username, 'question: ', question);
             });
             
-
-
-
-
-
             
             // Extract usernames and shuffle the player order randoml
             const players = users.map(user => user.username);
@@ -248,6 +250,7 @@ socketIO.on('connection', (socket) => {
                 .eq('room_code', socket.roomCode);
             // Notify all clients in the room about the new game state
             socketIO.to(socket.roomCode).emit('gameStateChange', { state: nextState, sittingOutPlayer });
+            
         } catch (error) {
             console.error('Error changing game state:', error.message);
         }
@@ -307,6 +310,9 @@ socket.on('submitAnswer', (roomCode) => {
         socketIO.to(roomCode).emit('updateGameState', games[roomCode].gameState);
         console.log('Submit Answer activated',games);
     }
+
+    socketIO.to(roomCode).emit('currentClicks',  games[roomCode].answersSubmitted);
+    
     console.log('Submit Answer activated (outside of loop )',games);
 });
 
