@@ -53,12 +53,19 @@ const GameLobby = ({ socket }) => {
     return(
         <> 
         <div className = "gameStartPage">
-            <h2> Welcome to the Lobby! </h2>
+            <h2> Welcome to Fibbage All About You! </h2>
             <h1> Hit start when all members are here! </h1>
             <button className="gameStart_btn" onClick={handleGameStart}>START GAME</button>
-            <h2>Fibbage Rules: </h2>
-            <p>- First everyone is prompted to answer a question about themselves</p>
-            <p>- </p>
+            <div className = "rules">
+            <h2 className ="rules-titleCard">Here's how the game will work: </h2>
+                <ol className = "bulleted-list">
+                    <li>First everyone is prompted to answer a unique question about themselves</li>
+                    <li>Next, one of those questions will be chosen.</li>
+                    <li>If that question is yours, sit tight! If it is not, your task is to submit an answer you think that person would have submitted</li>
+                    <li>Voting will begin! If you chose correctly, both you and question answerer will receive 15 pts.</li>
+                    <li>Wrong choices will give 10 pts to the one that deceived you! Remember this is a game of deception!</li>
+                </ol>
+            </div>
         </div>
         </>
     );

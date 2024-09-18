@@ -310,7 +310,7 @@ socket.on('submitAnswer', (roomCode) => {
         socketIO.to(roomCode).emit('updateGameState', games[roomCode].gameState);
         console.log('Submit Answer activated',games);
     }
-
+    socketIO.to(roomCode).emit('currentMembers',  games[roomCode].totalPlayers);
     socketIO.to(roomCode).emit('currentClicks',  games[roomCode].answersSubmitted);
     
     console.log('Submit Answer activated (outside of loop )',games);

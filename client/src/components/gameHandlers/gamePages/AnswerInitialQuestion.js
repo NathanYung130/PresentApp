@@ -14,6 +14,10 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
   const toStore = useRef(false);
   const [submit, setSubmit] = useState(false);
 
+  //submission count
+  const [clicks, setClicks] = useState(0);
+  const [numMembers, setNumMembers] = useState(0);
+
   //Handles all submission
   const handleSubmit = async (event) => {
     if (event) event.preventDefault();
@@ -65,6 +69,13 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
       socket.on('updateGameState', handleGameStateChange);
     };
 
+    socket.on('currentClicks', (answersSubmitted) => {
+      setClicks(answersSubmitted);
+    });
+    socket.on('currentMembers', (memberNumber) => {
+      setNumMembers(memberNumber);
+    });  
+
     return () => {
       socket.off('updateGameState');
     };
@@ -93,7 +104,8 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
           <button type="submit">Submit</button>
         )}
       </form>
-
+      
+    {/* <h2>{clicks}/{numMembers} Submitted</h2> */}
     </div>
   );
 };

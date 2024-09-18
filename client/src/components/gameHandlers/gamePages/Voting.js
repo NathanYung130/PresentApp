@@ -40,7 +40,9 @@ const Voting = ({ question, socket }) => {
     const onCompleteCall = useRef(false);
     const [submit, setSubmit] = useState(false);
 
+    //submission count
     const [clicks, setClicks] = useState(0);
+    const [numMembers, setNumMembers] = useState(0);
 
     // inserts username and score into backend via sql
     const uploadData = async ({username, newPoints}) => {
@@ -215,6 +217,8 @@ const Voting = ({ question, socket }) => {
         }
     };
 
+    // This useEffect is exclusively for handling websockets
+    // that handle central game control
     useEffect(() => {
 
         const handleGameStateChange = () => {
@@ -234,7 +238,9 @@ const Voting = ({ question, socket }) => {
             setClicks(answersSubmitted);
         });
 
-
+        socket.on('currentMembers', (memberNumber) => {
+            setNumMembers(memberNumber);
+        });
         satisfySocketForSitOut();
 
         return () => {
@@ -315,7 +321,7 @@ const Voting = ({ question, socket }) => {
         <div className="progress-circle-container">
             <CountProgressBar duration={20000} onComplete={timerHandler} />
         </div>
-        <h1>{clicks}</h1>
+        <h2>{clicks}/{numMembers} Submitted</h2>
         </>
 
     );

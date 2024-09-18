@@ -3,6 +3,7 @@ import { useRef, useEffect,  useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import supabase from '../../../supabaseClient';
 import CountProgressBar from '../../ProgressBar';
+import RockPaperS from './RockPaperS';
 
 
 const OthersAnswering = ({ question, roomID, socket }) => {
@@ -26,8 +27,9 @@ const OthersAnswering = ({ question, roomID, socket }) => {
     // prevent double submit
     const submissionRef = useState(false);
 
-    //TESTING ENVIRONMENT
+    //submission count
     const [clicks, setClicks] = useState(0);
+    const [numMembers, setNumMembers] = useState(0);
 
     //handle answer submissions, storing to backend
     const handleAnswer = async(event) => {
@@ -111,6 +113,9 @@ const OthersAnswering = ({ question, roomID, socket }) => {
         socket.on('currentClicks', (answersSubmitted) => {
             setClicks(answersSubmitted);
         });
+        socket.on('currentMembers', (memberNumber) => {
+            setNumMembers(memberNumber);
+        });
 
         satisfySocketForSitOut();
 
@@ -125,14 +130,15 @@ const OthersAnswering = ({ question, roomID, socket }) => {
         <>
         {excludeMe ? (
             <div className ="sittiingOutScreen"> 
-                <h1>Others Answering!</h1>
-                <h2> sit tight! </h2>
+                <h1>Others are Answering!</h1>
+                <h2> sit tight for now! </h2>
+                <RockPaperS/>
             </div>
 
         ) : (
 
             <div className="game-screen">
-                <h3>Answer the Question!</h3>
+                <h3>How Would {sitOut} Answer This Question? </h3>
                 <h2>{question}</h2>
 
                 <input className = "roomcode__input" ref = { input }/>
@@ -141,7 +147,7 @@ const OthersAnswering = ({ question, roomID, socket }) => {
                 ) : (
                     <button onClick = { handleAnswer }> Answer </button>
                 )}
-
+                <p>Note: you want to gaslight them into clicking this (wrong) choice</p>
             </div>
 
         )}
@@ -149,7 +155,7 @@ const OthersAnswering = ({ question, roomID, socket }) => {
         <CountProgressBar duration={20000} onComplete={timerHandler} />
         </div>
         
-        <h1>{clicks}</h1>
+        <h2>{clicks}/{numMembers} Submitted</h2>
 
         </>
     );

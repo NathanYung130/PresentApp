@@ -1,13 +1,13 @@
 
 .message__container {
     position: fixed;
-    bottom: 20px;
+    bottom: 50px;
     right: 20px; 
     width: 300px; 
-    max-height: 400px;
+    max-height: 150px;
     background-color: #fff; 
     border-radius: 10px; 
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); 
+
     overflow-y: auto;
     z-index: 1000; 
     padding: 10px;
