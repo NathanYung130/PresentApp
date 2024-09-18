@@ -87,7 +87,7 @@ button {
     bottom: 20px;
     right: 20px; 
     width: 300px; 
-    max-height: 400px;
+    max-height: 150px;
     background-color: #fff; 
     border-radius: 10px; 
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); 
@@ -96,9 +96,24 @@ button {
     padding: 10px;
     display: flex;
     flex-direction: column; 
+    margin-bottom: 30px;
 }
 
 
+.bulleted-list {
+  list-style-position: inside; /* Ensures bullets are inside the text block */
+  padding-left: 0; /* Removes default padding */
+  margin-left: 0;  /* Removes any additional margin */
+}
+
+.bulleted-list li {
+  text-align: left; /* Aligns the text to the left */
+}
+
+.rules-titleCard{
+  margin-top: 55px;
+  margin-bottom: 20px;
+}
 
 
 /* Sleek Scrollbar */

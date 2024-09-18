@@ -1,13 +1,13 @@
 .chat__footer {
-    display: flex;
-    padding: 10px;
-    background-color: #fff;
-    border-top: 1px solid #ddd;
+    display: fixed;
+    padding: 10 px;
+    border-radius: 10px;
     position: fixed; /* This makes the footer fixed on the screen */
     bottom: 0; /* Aligns it at the bottom of the screen */
-    right: 0; /* Start from the left edge */
-    width: 15%; /* Take full width of the screen */
+    right: 10; /* Start from the left edge */
+    width: 15%;
     z-index: 1000; /* Ensures it stays above other components */
+    margin-bottom: -10px;
 }
 
 .form {
@@ -18,7 +18,7 @@
 .message {
     flex-grow: 1;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 10px;
     border: 1px solid #c4c3c3;
     font-size: 12px;
 }

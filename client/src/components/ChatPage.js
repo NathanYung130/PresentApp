@@ -82,12 +82,14 @@ const ChatPage = ({ socket }) => {
                         lastMessageRef={lastMessageRef}
                         currentUserName={currentUserName}
                     />
+                    <div className = "sendTag">
                     <ChatFooter
                     socket={socket}
                     newMessage={newMessage}
                     setNewMessage={setNewMessage}
                     handleSendMessage={handleSendMessage}
                     />
+                    </div>
             </div>
         </div>
     
