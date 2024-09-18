@@ -40,6 +40,7 @@ const Leaderboard = ({ question, socket, inSession }) => {
                 setScore(0);
             } else{
                 console.log('sortedData: ', sortedData[0].username);
+                dispatch(setGameWinner(sortedData[0].username));
                 setScore(sortedData);
             }
         }
