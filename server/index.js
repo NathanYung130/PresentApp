@@ -1,224 +1,166 @@
 const express = require("express");
-const app = express();
-const PORT = 4000;
-
-const http = require("http").Server(app);
+const http = require("http");
+const socketIO = require("socket.io");
 const cors = require("cors");
-
-
-
-const socketIO = require("socket.io")(http, {
-    cors: {
-        origin: "http://localhost:3000",
-    },
-});
-
 const supabase = require('./supabaseClient');
 
+// Server setup
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server, {
+    cors: { origin: "http://localhost:3000" }
+});
 
+const PORT = 4000;
 app.use(cors());
+
+// Game state constants
 const gameStates = ['answerInitialQuestion', 'othersAnswering', 'voting', 'leaderboard'];
-const getNextState = (currentState) => {
-    const states = ['answerInitialQuestion', 'othersAnswering', 'voting', 'leaderboard'];
-    const currentIndex = states.indexOf(currentState);
-    return states[(currentIndex + 1) % states.length];
-};
-const rooms = {}; // structure to store room data
+const rooms = {};
 const games = {};
 
-socketIO.on('connection', (socket) => {
-    console.log(`⚡: ${socket.id} user just connected!`);
+// Utility functions
+const getNextState = (currentState) => {
+    const currentIndex = gameStates.indexOf(currentState);
+    return gameStates[(currentIndex + 1) % gameStates.length];
+};
 
-    socket.on('queryRoom', async ({ userName, roomCode }) => {
-        const { data: room, error: roomFetchError } = await supabase
+// Database operations
+const dbOperations = {
+    queryRoom: async (roomCode) => {
+        const { data, error } = await supabase
             .from('room_users')
             .select('roomcode')
             .eq('roomcode', roomCode);
-
-        if (roomFetchError) {
-            throw roomFetchError;
-        }
-
-        if (room.length === 0) {
-            console.log('room does not exist')
-            // If the room does not exist, send an error back to the client
-            socket.emit('roomNotFound');
-
-        } else {
-            console.log('room exists');
-            socket.emit('roomFound');
-        }
-
-        return;
-    });
-
-    socket.on('joinRoom', async ({ userName, roomCode, firstUser }) => {
-        console.log('userName: ', userName);
-        console.log('roomCode: ', roomCode);
-        console.log('firstUser: ', firstUser);
-        try {
-            // Use a transaction to ensure atomicity
-            const { data: room, error: roomFetchError } = await supabase
-                .from('room_users')
-                .select('roomcode')
+        if (error) throw error;
+        return data;
+    },
+    addUserToRoom: async (userName, roomCode, socketId, isAdmin) => {
+        const { error } = await supabase
+            .from('room_users')
+            .insert([{ username: userName, roomcode: roomCode, socketid: socketId, admin: isAdmin }]);
+        if (error) throw error;
+    },
+    getUsersInRoom: async (roomCode) => {
+        const { data, error } = await supabase
+            .from('room_users')
+            .select('username, socketid')
+            .eq('roomcode', roomCode);
+        if (error) throw error;
+        return data;
+    },
+    getQuestions: async () => {
+        const { data, error } = await supabase.from('questions').select('*');
+        if (error) throw error;
+        return data;
+    },
+    insertGameSession: async (roomCode, players) => {
+        const { error } = await supabase.from('game_sessions').insert({
+            room_code: roomCode,
+            current_question: 0,
+            current_answerer: null,
+            game_stage: 'answerInitialQuestion',
+            players: players,
+            answered_players: [],
+            sitting_out_player: null,
+            players_who_sat_out: []
+        });
+        if (error) throw error;
+    },
+    updateGameSession: async (roomCode, updateData) => {
+        const { error } = await supabase
+            .from('game_sessions')
+            .update(updateData)
+            .eq('room_code', roomCode);
+        if (error) throw error;
+    },
+    getGameSession: async (roomCode) => {
+        const { data, error } = await supabase
+            .from('game_sessions')
+            .select('*')
+            .eq('room_code', roomCode)
+            .single();
+        if (error) throw error;
+        return data;
+    },
+    insertMessage: async (text, name, roomCode, socketId) => {
+        const { error } = await supabase
+            .from('messages')
+            .insert([{ text, name, roomcode: roomCode, socketid: socketId }]);
+        if (error) throw error;
+    },
+    removeUserFromRoom: async (socketId) => {
+        const { error } = await supabase
+            .from('room_users')
+            .delete()
+            .eq('socketid', socketId);
+        if (error) throw error;
+    },
+    cleanupRoom: async (roomCode) => {
+        const tables = ['messages', 'game_sessions', 'question_answers', 'real_answers', 'score_tracker'];
+        for (const table of tables) {
+            const { error } = await supabase
+                .from(table)
+                .delete()
                 .eq('roomcode', roomCode);
+            if (error) throw error;
+        }
+    }
+};
 
-            if (roomFetchError) {
-                throw roomFetchError;
-            }
-
-            //Subscribe to room changes
+// Socket event handlers
+const socketHandlers = {
+    queryRoom: async (socket, { userName, roomCode }) => {
+        try {
+            const room = await dbOperations.queryRoom(roomCode);
+            socket.emit(room.length === 0 ? 'roomNotFound' : 'roomFound');
+        } catch (error) {
+            console.error('Error querying room:', error.message);
+        }
+    },
+    joinRoom: async (socket, { userName, roomCode, firstUser }) => {
+        try {
+            await dbOperations.addUserToRoom(userName, roomCode, socket.id, firstUser);
             socket.join(roomCode);
             socket.roomCode = roomCode;
-
-            //Insert new user into database
-            console.log('Adding to store', socket.id);
-            const { error: insertError } = await supabase
-                .from('room_users')
-                .insert([{ username: userName, roomcode: roomCode, socketid: socket.id, admin: firstUser }]);
-
-            if (insertError) throw insertError;
-
-            const { data: users, error: fetchError } = await supabase
-                .from('room_users')
-                .select('username, socketid')
-                .eq('roomcode', roomCode);
-
-            if (fetchError) throw fetchError;
-
-            socketIO.to(roomCode).emit('newUserResponse', users);
-
+            const users = await dbOperations.getUsersInRoom(roomCode);
+            io.to(roomCode).emit('newUserResponse', users);
         } catch (error) {
             console.error('Error handling joinRoom:', error.message);
         }
-    
-
-     
-    //=============== GAME START HANDLER ==================
-    //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
-    //Game start notifier, activated when user clicks "Start Game"
-    //@data = any data to be passed (to be decided if this is neccessary)
-    //USER STARTS GAME: this one is to emit
-    socket.on('startGame', () => {
-        console.log('Game started in room: ', roomCode);
-        //Broadcast to all users that game has started
-        socketIO.to(roomCode).emit('gameStarted');
-    });
-
-
-
-    socket.on('startGame', async () => {
+    },
+    startGame: async (socket) => {
         try {
-            // Fetch all users in the current room from the database
-            const { data: users, error: fetchError } = await supabase
-                .from('room_users')
-                .select('username')
-                .eq('roomcode', socket.roomCode);
-
-            if (fetchError) throw fetchError;
-
-
-            //get total players in room
-            if (!rooms[socket.roomCode]) {
-                rooms[socket.roomCode] = {
-                    totalPlayers : users.length,
-                    amsweredUsers: [],
-                }
-            }
-                //Set up the game state if it doesn't already exist
-                const totalPlayers = users.length;
-            if (!games[socket.roomCode]) {
-                games[socket.roomCode] = {
-                    answersSubmitted: 0,
-                    totalPlayers: rooms[socket.roomCode].totalPlayers, // Ensure this is correctly set
-                    gameState: 'answerInitialQuestion', // Set initial game state
-                };
-            }
-
-
-
-
-            // Fetch all questions
-            const { data: questions, error: fetchQuestionsError } = await supabase
-                .from('questions')
-                .select('*');
-            
-            if (fetchQuestionsError) throw fetchQuestionsError;
-            console.log(questions)
-            // Shuffle the questions array and assign each player a unique question
+            const users = await dbOperations.getUsersInRoom(socket.roomCode);
+            const questions = await dbOperations.getQuestions();
             const shuffledQuestions = questions.sort(() => 0.5 - Math.random());
-            const playerQuestions = users.map((user, index) => ({
-                username: user.username,
-                question: shuffledQuestions[index % shuffledQuestions.length].question_text,
-            }));
             
-
-            // Store the assigned questions in a Redux store or send them to each client
-            playerQuestions.forEach(({ username, question }) => {
-                // socketIO.to(socket.roomCode).emit('assignedQuestion', { username, question });
-                console.log(`Emitting question for username: ${username}, question: ${question}`);
-                socketIO.to(socket.roomCode).emit('assignedQuestion', { username, question });
-                console.log('room code: ', socket.roomCode);
-                
-            //   console.log('username: ', username, 'question: ', question);
+            users.forEach((user, index) => {
+                const question = shuffledQuestions[index % shuffledQuestions.length].question_text;
+                io.to(socket.roomCode).emit('assignedQuestion', { username: user.username, question });
             });
-            
-            
-            // Extract usernames and shuffle the player order randoml
+
             const players = users.map(user => user.username);
             const shuffledPlayers = players.sort(() => 0.5 - Math.random());
+            await dbOperations.insertGameSession(socket.roomCode, shuffledPlayers);
 
-            // Insert a new game session into the database
-            const { error: insertError } = await supabase.from('game_sessions').insert({
-                room_code: socket.roomCode,
-                current_question: 0,
-                current_answerer: null,
-                game_stage: 'answerInitialQuestion',// Set initial game state
-                players: shuffledPlayers,
-                answered_players: [],
-                sitting_out_player: null,
-                players_who_sat_out: []
-            });
+            rooms[socket.roomCode] = { totalPlayers: users.length, answeredUsers: [] };
+            games[socket.roomCode] = { answersSubmitted: 0, totalPlayers: users.length, gameState: 'answerInitialQuestion' };
 
-            if (insertError) throw insertError;
-
-            // Notify all clients in the room that the game has started
-            // socketIO.to(socket.roomCode).emit('gameStateChange', { 
-            //     state: 'answerInitialQuestion', 
-            //     message: 'Answer question 1' 
-            // });
-            // socketIO.to(socket.roomCode).emit('gameStateChange', { state: 'answerInitialQuestion', sittingOutPlayer: 'na'});
-            state = 'answeringInitialQuestions';
-            socketIO.to(socket.roomCode).emit('gameStateChange', { 
-              state: gameStates[0], 
-              sittingOutPlayer: 'na' 
-          }); console.log(state, ' state');
-
+            io.to(socket.roomCode).emit('gameStateChange', { state: gameStates[0], sittingOutPlayer: 'na' });
         } catch (error) {
             console.error('Error starting game:', error.message);
         }
-    });
-
-    // Handler for advancing to the next game state
-    socket.on('nextGameState', async () => {
+    },
+    nextGameState: async (socket) => {
         try {
-            // Fetch the current game session data from the database
-            const { data, error } = await supabase
-                .from('game_sessions')
-                .select('*')
-                .eq('room_code', socket.roomCode)
-                .single();
-
-            if (error) throw error;
-
-            // Initialize variables for the next state
+            const data = await dbOperations.getGameSession(socket.roomCode);
             let nextState;
             let sittingOutPlayer = data.sitting_out_player;
             let answeredPlayers = data.answered_players || [];
             let playersWhoSatOut = data.players_who_sat_out || [];
             let currentStateIndex = gameStates.indexOf(data.game_stage);
 
-            // Determine the next game state, but doesn't go back to initial state
             if (currentStateIndex === -1 || currentStateIndex === gameStates.length - 1) {
                 nextState = gameStates[1];
             } else {
@@ -229,198 +171,97 @@ socketIO.on('connection', (socket) => {
                 const availablePlayers = data.players.filter(player => !playersWhoSatOut.includes(player));
                 
                 if (availablePlayers.length === 0) {
-                    // If all players have sat out, move to endgame
                     nextState = 'endGame';
                 } else {
-                    // Choose a new player to sit out
                     sittingOutPlayer = availablePlayers[0];
                     playersWhoSatOut.push(sittingOutPlayer);
                     answeredPlayers = [sittingOutPlayer];
                 }
             }
-            // Update the game session in the database
-            await supabase
-                .from('game_sessions')
-                .update({
-                    game_stage: nextState,
-                    sitting_out_player: sittingOutPlayer,
-                    answered_players: answeredPlayers,
-                    players_who_sat_out: playersWhoSatOut
-                })
-                .eq('room_code', socket.roomCode);
-            // Notify all clients in the room about the new game state
-            socketIO.to(socket.roomCode).emit('gameStateChange', { state: nextState, sittingOutPlayer });
-            
+
+            await dbOperations.updateGameSession(socket.roomCode, {
+                game_stage: nextState,
+                sitting_out_player: sittingOutPlayer,
+                answered_players: answeredPlayers,
+                players_who_sat_out: playersWhoSatOut
+            });
+
+            io.to(socket.roomCode).emit('gameStateChange', { state: nextState, sittingOutPlayer });
         } catch (error) {
             console.error('Error changing game state:', error.message);
         }
-
-    });
-
-
-});
-   
-// SENDING MESSAGES//
-socket.on('message', async (data) => {
-  try {
-      console.log('Received message data:', data);
-
-      // Ensure all necessary fields are present
-      if (!data.text || !data.name || !data.socketID) {
-          throw new Error('Missing data fields');
-      }
-
-      // Store message in Supabase
-      const { error } = await supabase
-          .from('messages')
-          .insert([{ text: data.text, name: data.name, roomcode: data.roomCode, socketid: data.socketID }]);
-
-      if (error) throw error;
-
-      // Emit the message to all clients in the room
-      socketIO.to(data.roomCode).emit('messageResponse', {
-          text: data.text,
-          name: data.name,
-          socketID: data.socketID
-      });
+    },
+    message: async (socket, data) => {
+        try {
+            if (!data.text || !data.name || !data.socketID) {
+                throw new Error('Missing data fields');
+            }
+            await dbOperations.insertMessage(data.text, data.name, data.roomCode, data.socketID);
+            io.to(data.roomCode).emit('messageResponse', data);
         } catch (error) {
             console.error('Error handling message:', error.message);
         }
-});
+    },
+    submitAnswer: (socket, roomCode) => {
+        games[roomCode].answersSubmitted += 1;
+        if (games[roomCode].answersSubmitted === games[roomCode].totalPlayers) {
+            games[roomCode].answersSubmitted = 0;
+            games[roomCode].gameState = getNextState(games[roomCode].gameState);
+            io.to(roomCode).emit('updateGameState', games[roomCode].gameState);
+        }
+        io.to(roomCode).emit('currentMembers', games[roomCode].totalPlayers);
+        io.to(roomCode).emit('currentClicks', games[roomCode].answersSubmitted);
+    },
+    disconnect: async (socket) => {
+        try {
+            const roomCode = socket.roomCode;
+            await dbOperations.removeUserFromRoom(socket.id);
+            const remainingUsers = await dbOperations.getUsersInRoom(roomCode);
+            io.to(roomCode).emit('newUserResponse', remainingUsers);
 
-//Moves to NEXT STATE after all users submit their answers
-socket.on('submitAnswer', (roomCode) => {
-    // Increment answer count for the room
-    games[roomCode].answersSubmitted += 1;
-    console.log('submitted answers',games[roomCode].answersSubmitted);
-    // Check if all players have submitted their answers
-    if (games[roomCode].answersSubmitted === games[roomCode].totalPlayers) {
-        // Reset answer count
-        games[roomCode].answersSubmitted = 0;
-        
-        // Move to the next game state
-        // [MAKE SURE that this game state is synced with the frontend. The change should be reflected in here
-        // when the gamestate changes regardless of how it is changed. might want to make another event that 
-        // updates the game state in the backend whenever it is changed in the fron end (maybe use a global veriable
-        //in change game state)]
-        games[roomCode].gameState = getNextState(games[roomCode].gameState);
-        
-        // Emit event to all clients in the room
-        // io.to(roomCode).emit('updateGameState', games[roomCode].gameState);
-        socketIO.to(roomCode).emit('updateGameState', games[roomCode].gameState);
-        console.log('Submit Answer activated',games);
-    }
-    socketIO.to(roomCode).emit('currentMembers',  games[roomCode].totalPlayers);
-    socketIO.to(roomCode).emit('currentClicks',  games[roomCode].answersSubmitted);
-    
-    console.log('Submit Answer activated (outside of loop )',games);
-});
+            if (remainingUsers.length === 0) {
+                await dbOperations.cleanupRoom(roomCode);
+                console.log(`Deleted game session for room: ${roomCode}`);
+            }
 
-
-
-
-
-socket.on('disconnect', async () => {
-  try {
-      const roomCode = socket.roomCode;
-      console.log('User disconnected:', socket.id);
-
-      const { error: deleteUserError } = await supabase
-          .from('room_users')
-          .delete()
-          .eq('socketid', socket.id);
-
-      if (deleteUserError) throw deleteUserError;
-
-      const { data: remainingUsers, error: fetchRemainingError } = await supabase
-          .from('room_users')
-          .select('username, socketid')
-          .eq('roomcode', roomCode);
-
-      if (fetchRemainingError) throw fetchRemainingError;
-
-      socketIO.to(roomCode).emit('newUserResponse', remainingUsers);
-
-      // If the room is empty, delete all messages and the game session
-      if (remainingUsers.length === 0) {
-          // Delete all messages for the room
-          const { error: deleteMessagesError } = await supabase
-              .from('messages')
-              .delete()
-              .eq('roomcode', roomCode);
-
-          if (deleteMessagesError) throw deleteMessagesError;
-
-          // Delete the game session for the room
-          const { error: deleteGameSessionError } = await supabase
-              .from('game_sessions')
-              .delete()
-              .eq('room_code', roomCode);
-
-          if (deleteGameSessionError) throw deleteGameSessionError;
-
-            // Delete all rows of question_answers from db
-            const { error: deleteQuestionAnswers} = await supabase
-                .from('question_answers')
-                .delete()
-                .eq('roomcode', roomCode);
-
-            if (deleteQuestionAnswers) throw deleteQuestionAnswers;
-
-            // Delete all rows of score_tracker from db
-            const { error: deleteRealAnswers} = await supabase
-                .from('real_answers')
-                .delete()
-                .eq('roomcode', roomCode);
-
-            if (deleteRealAnswers) throw deleteRealAnswers;
-
-            // Delete all rows of score_tracker from db
-            const { error: deleteScoreError} = await supabase
-                .from('score_tracker')
-                .delete()
-                .eq('roomcode', roomCode);
-
-            if (deleteScoreError) throw deleteScoreError;
-
-
-            
-
-          console.log(`Deleted game session for room: ${roomCode}`);
-      }
-
-      socket.leave(roomCode);
-  } catch (error) {
-      console.error('Error handling disconnect:', error.message);
-  }
-});
-});
-
-socketIO.on('query', (socket) => {
-    
-    socket.on('ifRoomExists', async ({ targetRoom }) => {
-        console.log(`⚡: ${socket.id} Made a request!`);
-        // Fetch roomcode
-        const { data: room, error: fetchError } = await supabase
-            .from('room_users')
-            .select('roomcode')
-            .eq('roomcode', targetRoom);
-
-            if (fetchError) {
-                console.error(fetchError);
-              } else {
-                  console.log(room);
-                const roomExists = room.length > 0;
-                console.log('RoomChecker: ',roomExists); // true or false
-              }
-    })
-
-    socket.on('pingServer', () => {
+            socket.leave(roomCode);
+        } catch (error) {
+            console.error('Error handling disconnect:', error.message);
+        }
+    },
+    ifRoomExists: async (socket, { targetRoom }) => {
+        try {
+            const room = await dbOperations.queryRoom(targetRoom);
+            console.log('RoomChecker:', room.length > 0);
+        } catch (error) {
+            console.error('Error checking if room exists:', error.message);
+        }
+    },
+    pingServer: (socket) => {
         console.log('Ping received');
         socket.emit('pongClient');
-    });
+    }
+};
+
+// Socket.IO connection handler
+io.on('connection', (socket) => {
+    console.log(`⚡: ${socket.id} user just connected!`);
+
+    socket.on('queryRoom', (data) => socketHandlers.queryRoom(socket, data));
+    socket.on('joinRoom', (data) => socketHandlers.joinRoom(socket, data));
+    socket.on('startGame', () => socketHandlers.startGame(socket));
+    socket.on('nextGameState', () => socketHandlers.nextGameState(socket));
+    socket.on('message', (data) => socketHandlers.message(socket, data));
+    socket.on('submitAnswer', (roomCode) => socketHandlers.submitAnswer(socket, roomCode));
+    socket.on('disconnect', () => socketHandlers.disconnect(socket));
 });
 
-http.listen(PORT, () => {
+io.of("/").on('connection', (socket) => {
+    socket.on('ifRoomExists', (data) => socketHandlers.ifRoomExists(socket, data));
+    socket.on('pingServer', () => socketHandlers.pingServer(socket));
+});
+
+// Start the server
+server.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
 });
