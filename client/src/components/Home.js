@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-
 import { nanoid } from 'nanoid'
+import MoreInfo from './MoreInfo';
 
-import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
+import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice';
+
 
 import './styles/Home.css'
 
@@ -86,6 +87,7 @@ const Home = ({ socket }) => {
 
     }, [roomCode, navigate, createState, socket, updateStores, userName]);
 
+
     //========== Pop Up control: =============\\
     const [popup, setPopup] = useState(null);
 
@@ -97,56 +99,110 @@ const Home = ({ socket }) => {
       setPopup(null);
     };
     //=========================================\\
+
+    const [bannerVisible, setBannerVisible] = useState(false);
+
+    // Scroll event listener to toggle banner
+    useEffect(() => {
+        const handleScroll = () => {
+            const logoElement = document.querySelector('.logo');
+            const logoPosition = logoElement?.getBoundingClientRect().top;
+            
+            if (logoPosition < 100) {
+                setBannerVisible(true);
+            } else {
+                setBannerVisible(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    
+// // ============ Logo Styling ===================\\
+// const logo = document.querySelector('.logo');
+
+// // Define the scroll threshold (adjust as needed)
+// const threshold = 800; // pixels
+
+// // Add event listener for scroll
+// window.addEventListener('scroll', () => {
+//   if (window.scrollY > threshold) {
+//     logo.classList.add('light');
+//   } else {
+//     logo.classList.remove('light');
+//   }
+// });
+
+
+
     return (
         <>
-        <h1 className = "Title">Joe-Box</h1>
-        <form className="home__container">
-            <h2 className="home__header">Enter User or  Room Code</h2>
-            <label htmlFor="username">Username</label>
-            <input
-                type="text"
-                minLength={6}
-                name="username"
-                id="username"
-                className="username__input"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-            />
-            <label htmlFor="roomCode">Room Code</label>
-            <input
-                type="text"
-                minLength={6}
-                name="roomCode"
-                id="roomCode"
-                className="roomcode__input"
-                value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value)}
-            />
-            <div className = "buttons">
-                <button className = "interaction" type = "button" onClick = {handleSearch}>Search Room</button>
-                <button className = "interaction"type = "button" onClick = {handleCreate}>Create Room</button>
-            </div>
-        </form>
 
-        {popup && (
-            <div className="popup">
-                <div className="popup-content">
-                    <span className="close" onClick={closePopup}>&times;</span>
-                    {popup === 'userNameError' &&
-                    <div className= "popText">
-                        <p>Enter a Username!</p>
-                    </div>}
-                    {popup === 'roomError' &&
-                    <div className= "popText">
-                        <p>Room Codes Must be At Least 6 Characters!</p>
-                    </div>}
-                    {popup === 'noRoom' &&
-                    <div className= "popText">
-                        <p>No Room Found!</p>
-                    </div>}
+        <h1 className = "logo">Joe-Box</h1>
+        <div className = "JoeBoxLogin">
+            <form className="home__container">
+                <h2 className="home__header">Let's Play</h2>
+                <label htmlFor="username">Username</label>
+                <input
+                    type="text"
+                    minLength={6}
+                    name="username"
+                    id="username"
+                    className="username__input"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                />
+                <label htmlFor="roomCode">Room Code</label>
+                <input
+                    type="text"
+                    minLength={6}
+                    name="roomCode"
+                    id="roomCode"
+                    className="roomcode__input"
+                    value={roomCode}
+                    onChange={(e) => setRoomCode(e.target.value)}
+                />
+                <div className = "buttons">
+                    <button className = "interaction" type = "button" onClick = {handleSearch}>Search Room</button>
+                    <button className = "interaction"type = "button" onClick = {handleCreate}>Create Room</button>
                 </div>
+            </form>
+
+            {popup && (
+                <div className="popup">
+                    <div className="popup-content">
+                        <span className="close" onClick={closePopup}>&times;</span>
+                        {popup === 'userNameError' &&
+                        <div className= "popText">
+                            <p>Enter a Username!</p>
+                        </div>}
+                        {popup === 'roomError' &&
+                        <div className= "popText">
+                            <p>Room Codes Must be At Least 6 Characters!</p>
+                        </div>}
+                        {popup === 'noRoom' &&
+                        <div className= "popText">
+                            <p>No Room Found!</p>
+                        </div>}
+                    </div>
+                </div>
+            )}
+
+            <div className = "Rules">
+                <h1>Rules:</h1>
+
             </div>
-        )}
+        </div>
+        <div className = "backroundContainer">
+            <div className = "ExtraInfo">
+                <MoreInfo/>
+            </div>
+        </div>
         </>
     );
 };

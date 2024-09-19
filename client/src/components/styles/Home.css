@@ -1,25 +1,33 @@
-.Title {
-    text-align: center;
-}
+
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #f0f4f8;
-    display: flex;
-    justify-content: center;
+    display: absolute;
     align-items: center;
     height: 100vh;
     margin: 0;
 }
 
 .home__container {
+    display: absolute;
     background: #ffffff;
-    padding: 8rem;
+    padding: 50px;
     border-radius: 15px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    width: 100%;
+    width: 90%;
+    height: 300px;
     max-width: 400px;
     text-align: center;
+    justify-content: center;
+    /* margin-top: 100px;
+    margin-left: 50px; */
 }
+
+.logo.light {
+    filter: invert(1); /* change logo to black (invert white) */
+    /* or use: */
+    /* filter: brightness(0) saturate(100) invert(1); */
+  }
 
 .home__header {
     font-size: 1.8rem;
@@ -38,7 +46,7 @@ label {
 }
 
 .username__input, .roomcode__input {
-    width: 100%;
+    width: 80%;
     padding: 0.8rem;
     margin-bottom: 1rem;
     border-radius: 10px;
@@ -199,3 +207,75 @@ label {
     stroke: #180161;
     transition: stroke-dashoffset 0.5s ease;
 }
+
+.Title{
+    display: absolute;
+    align-items: left;
+}
+
+/* .JoeBoxLogin{
+    width: 600px;/
+    margin: 0 auto;
+} */
+
+.JoeBoxLogin{
+    display: flex;
+    height: 95vh;
+    
+    flex-direction: row;
+    justify-items: center; /* Centers items horizontally */
+    align-items: center; /* Centers items vertically */
+    justify-content: center;
+}
+
+.ExtraInfo{
+    background-color: #fff;
+    display: absolute;
+    max-width: 900px; /* adjust the value as needed */
+    color:rgba(0, 0, 0, 0.5);
+    margin-left: 200px;
+}
+
+.backroundContainer{
+    display: absolute;
+    background-color: #fff;
+}
+
+/* Rules */
+.Rules{
+    color:rgba(0, 0, 0, 0.5);
+    background-color: #fff;
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
+    top: -11px;
+
+    height: 300px;
+    width: 400px;
+    /* height: auto;
+    width: auto; */
+    max-width: 600px;
+    display: absolute;
+    margin-left: 10px;
+}
+
+
+
+/*
+// // ============ Logo Styling ===================\\
+// const logo = document.querySelector('.logo');
+
+// // Define the scroll threshold (adjust as needed)
+// const threshold = 200; // pixels
+
+// // Add event listener for scroll
+// window.addEventListener('scroll', () => {
+//   if (window.scrollY > threshold) {
+//     logo.classList.add('light');
+//   } else {
+//     logo.classList.remove('light');
+//   }
+// });
+
+*/
