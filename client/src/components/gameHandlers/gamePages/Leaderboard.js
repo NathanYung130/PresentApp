@@ -39,8 +39,20 @@ const Leaderboard = ({ question, socket, inSession }) => {
             if (sortedData.length === 0){
                 setScore(0);
             } else{
-                console.log('sortedData: ', sortedData[0].username);
-                dispatch(setGameWinner(sortedData[0].username));
+                console.log('sortedData first entry: ', sortedData[0].username);
+                if (sortedData.length > 1){
+                    if (sortedData[0].pts === sortedData[1].pts){
+                        console.log('Tie Detected');
+                        dispatch(setGameWinner('Tie'));
+                    } else {
+                        console.log('dispatching to store: ',sortedData[0].username)
+                        dispatch(setGameWinner(sortedData[0].username));
+                    }
+                } else {
+                    // No tie
+                    console.log('dispatching to store: ',sortedData[0].username)
+                    dispatch(setGameWinner(sortedData[0].username));
+                }
                 setScore(sortedData);
             }
         }

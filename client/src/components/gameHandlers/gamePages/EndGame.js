@@ -14,7 +14,9 @@ const EndGame = () => {
 
     useEffect(() => {
         if (winner === null){
-            setWinnerDisp('A Tie ?!?');
+            setWinnerDisp('Thanks For Playing');
+        } else if (winner === 'Tie') {
+            setWinnerDisp('A Tie has Been had!');
         } else{
             setWinnerDisp(winner);
         }    
