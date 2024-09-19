@@ -1,17 +1,25 @@
 const express = require("express");
 const http = require("http");
-const socketIO = require("socket.io");
+const { Server } = require("socket.io");
+const path = require("path");
 const cors = require("cors");
 const supabase = require('./supabaseClient');
 
 // Server setup
 const app = express();
+const PORT = process.env.PORT || 4000;
+
+const staticPath = path.resolve(__dirname, ".", "dist");
+app.use(express.static(staticPath));
+
 const server = http.createServer(app);
-const io = socketIO(server, {
-    cors: { origin: "http://localhost:3000" }
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:3000", "https://joeboxmulti.onrender.com/"],
+    methods: ["GET", "POST"]
+  }
 });
 
-const PORT = 4000;
 app.use(cors());
 
 // Game state constants
