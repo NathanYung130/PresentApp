@@ -107,10 +107,14 @@ const dbOperations = {
     cleanupRoom: async (roomCode) => {
         const tables = ['messages', 'game_sessions', 'question_answers', 'real_answers', 'score_tracker'];
         for (const table of tables) {
+            let columnName = 'roomcode';
+            if (table === 'game_sessions') {
+                columnName = 'room_code';
+            }
             const { error } = await supabase
                 .from(table)
                 .delete()
-                .eq('roomcode', roomCode);
+                .eq(columnName, roomCode);
             if (error) throw error;
         }
     }
