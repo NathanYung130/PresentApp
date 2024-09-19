@@ -5,12 +5,13 @@ import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
 
 import { nanoid } from 'nanoid';
 
-import styles from './styles/ChatBar.css'
+import './styles/ChatBar.css'
 
 const ChatBar = ({ socket }) => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const roomId = useSelector((state) => state.room.roomId);
+  const userId = useSelector((state) => state.room.userName);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -40,8 +41,10 @@ const ChatBar = ({ socket }) => {
           <h4 className="chat__header">ACTIVE USERS</h4>
           <div className="chat__users">
             {users.map((user) => (
-              // <p key={user.socketID}>{user.username}</p>
-              <p key={nanoid(8)}>{user.username}</p>
+              <p 
+              key={nanoid(8)}
+              className={user.username === userId ? 'active-user' : ''}
+              >{user.username}</p>
             ))}
           </div>
           <h4> Room: </h4>
