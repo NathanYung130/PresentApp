@@ -1,0 +1,26 @@
+.moreInfoDiv{
+    margin-bottom: 0px;
+}
+
+.img1{
+    margin-top: 20px;
+    height: 350px;
+    width: 455px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.img2{
+    margin-top: 20px;
+    height: 350px;
+    width: 200px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+
+.How-To{
+    display: block;
+    justify-content: center;
+    text-align: center;
+}

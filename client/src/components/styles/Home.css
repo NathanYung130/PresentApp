@@ -1,25 +1,34 @@
-.Title {
-    text-align: center;
-}
+
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f0f4f8;
-    display: flex;
-    justify-content: center;
+    /* background-color: #f0f4f8; */
+    display: absolute;
     align-items: center;
     height: 100vh;
     margin: 0;
 }
 
 .home__container {
+    display: absolute;
     background: #ffffff;
-    padding: 8rem;
+    padding: 50px;
     border-radius: 15px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    width: 100%;
+    width: 90%;
+    height: 300px;
     max-width: 400px;
     text-align: center;
+    justify-content: center;
+    margin-top: -100px;
+    /* margin-top: 100px;
+    margin-left: 50px; */
 }
+
+.logo.light {
+    filter: invert(1); /* change logo to black (invert white) */
+    /* or use: */
+    /* filter: brightness(0) saturate(100) invert(1); */
+  }
 
 .home__header {
     font-size: 1.8rem;
@@ -38,7 +47,7 @@ label {
 }
 
 .username__input, .roomcode__input {
-    width: 100%;
+    width: 80%;
     padding: 0.8rem;
     margin-bottom: 1rem;
     border-radius: 10px;
@@ -81,12 +90,7 @@ label {
     gap: 10px;
 }
 
-@media (max-width: 600px) {
-    .home__container {
-        padding: 1.5rem;
-        width: 90%;
-    }
-}
+
 
 .alert {
     background-color: #ffdddd; /* Light pink background for a warning */
@@ -198,4 +202,150 @@ label {
     fill: none;
     stroke: #180161;
     transition: stroke-dashoffset 0.5s ease;
+}
+
+.Title{
+    display: absolute;
+    align-items: left;
+}
+
+/* .JoeBoxLogin{
+    width: 600px;/
+    margin: 0 auto;
+} */
+
+.JoeBoxLogin{
+    display: flex;
+    height: 100vh;
+    
+    flex-direction: row;
+    justify-items: center; /* Centers items horizontally */
+    align-items: center; /* Centers items vertically */
+    justify-content: center;
+    margin-bottom: -250px;
+
+    background: rgb(131,58,180);
+    background: linear-gradient(333deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+}
+
+.ExtraInfo{
+    background-color: #fff;
+    display: absolute;
+    max-width: 900px; /* adjust the value as needed */
+    color:rgba(0, 0, 0, 0.5);
+    margin-left: 0;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    font-size: 18px;
+}
+
+.backroundContainer{
+    /* display: flex;
+    position: absolute;
+    background-color: #fff;
+    margin-bottom: 0;
+    justify-content: center;
+    align-items: center; */
+
+    display: flex;
+    background-color: #fff;
+    height: 100vh; /* Full viewport height for centering */
+    margin-bottom: 10px;
+    justify-content: center; /* Centers horizontally */
+
+}
+
+/* Rules */
+.Rules{
+    color:rgba(0, 0, 0, 0.5);
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    position: relative;
+    top: -60px;
+
+    height: 379px;
+    width: 550px;
+    /* height: auto;
+    width: auto; */
+    max-width: 600px;
+    display: absolute;
+    margin-left: 10px;
+}
+
+
+
+
+.svgContainer{
+    
+    margin-bottom: -20px;
+}
+
+.logocontainer{
+    position: fixed;
+    display: fixed;
+    margin-left: 0px;
+    color: #fff;
+}
+
+
+/*
+// // ============ Logo Styling ===================\\
+// const logo = document.querySelector('.logo');
+
+// // Define the scroll threshold (adjust as needed)
+// const threshold = 200; // pixels
+
+// // Add event listener for scroll
+// window.addEventListener('scroll', () => {
+//   if (window.scrollY > threshold) {
+//     logo.classList.add('light');
+//   } else {
+//     logo.classList.remove('light');
+//   }
+// });
+
+*/
+
+
+@media (max-width: 768px) {
+    .home__container {
+        padding: 1.5rem;
+        width: 50vh;
+    }
+    .JoeBoxLogin{
+        display: flex;
+        height: 150vh;
+        
+        flex-direction: column;
+        justify-items: center; /* Centers items horizontally */
+        align-items: center; /* Centers items vertically */
+        justify-content: center;
+    }
+    .Rules{
+        color:rgba(0, 0, 0, 0.5);
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 15px;
+        position: relative;
+        height: 379px;
+        width: 54vh;
+        /* height: auto;
+        width: auto; */
+        max-width: 600px;
+        display: absolute;
+        margin-left: 10px;
+        padding-bottom: 5vh;
+    }
+
+    .ExtraInfo{
+        background-color: #fff;
+        display: absolute;
+        max-width: 900px; /* adjust the value as needed */
+        color:rgba(0, 0, 0, 0.5);
+        margin-left: 5vh;
+    }
+    
+        
 }
