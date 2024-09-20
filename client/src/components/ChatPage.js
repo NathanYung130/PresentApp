@@ -64,35 +64,39 @@ const ChatPage = ({ socket }) => {
         setNewMessage('');
     };
 
+    document.body.style.overflow = 'hidden';
+
     return (
         <>
-        <div className="logo">
-            <h1>Joe Box</h1>
-        </div>
-        <div className = "window">
-                <ChatBar socket={socket} />
-                <div className = "gameDisp">
-                    <GameDisplay socket={socket}/>
+        <div className="GameScreenMessages">
+                <div className="">
+                    <h1>Joe-Box</h1>
                 </div>
-                <div className="chat__main">
-                    <ChatBody
-                        socket={socket}
-                        messages={messages}
-                        typingStatus={typingStatus}
-                        lastMessageRef={lastMessageRef}
-                        currentUserName={currentUserName}
-                    />
-                    <div className = "sendTag">
-                    <ChatFooter
-                    socket={socket}
-                    newMessage={newMessage}
-                    setNewMessage={setNewMessage}
-                    handleSendMessage={handleSendMessage}
-                    />
+
+            <div className = "window">
+                    <ChatBar socket={socket} />
+                    <div className = "gameDisp">
+                        <GameDisplay socket={socket}/>
                     </div>
+                    <div className="chat__main">
+                        <ChatBody
+                            socket={socket}
+                            messages={messages}
+                            typingStatus={typingStatus}
+                            lastMessageRef={lastMessageRef}
+                            currentUserName={currentUserName}
+                        />
+                        <div className = "sendTag">
+                        <ChatFooter
+                        socket={socket}
+                        newMessage={newMessage}
+                        setNewMessage={setNewMessage}
+                        handleSendMessage={handleSendMessage}
+                        />
+                        </div>
+                </div>
             </div>
         </div>
-    
     </>
     );
 };

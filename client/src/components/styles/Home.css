@@ -1,7 +1,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f0f4f8;
+    /* background-color: #f0f4f8; */
     display: absolute;
     align-items: center;
     height: 100vh;
@@ -19,6 +19,7 @@ body {
     max-width: 400px;
     text-align: center;
     justify-content: center;
+    margin-top: -100px;
     /* margin-top: 100px;
     margin-left: 50px; */
 }
@@ -215,12 +216,16 @@ label {
 
 .JoeBoxLogin{
     display: flex;
-    height: 95vh;
+    height: 100vh;
     
     flex-direction: row;
     justify-items: center; /* Centers items horizontally */
     align-items: center; /* Centers items vertically */
     justify-content: center;
+    margin-bottom: -250px;
+
+    background: rgb(131,58,180);
+    background: linear-gradient(333deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
 }
 
 .ExtraInfo{
@@ -228,12 +233,26 @@ label {
     display: absolute;
     max-width: 900px; /* adjust the value as needed */
     color:rgba(0, 0, 0, 0.5);
-    margin-left: 200px;
+    margin-left: 0;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    font-size: 18px;
 }
 
 .backroundContainer{
-    display: absolute;
+    /* display: flex;
+    position: absolute;
     background-color: #fff;
+    margin-bottom: 0;
+    justify-content: center;
+    align-items: center; */
+
+    display: flex;
+    background-color: #fff;
+    height: 100vh; /* Full viewport height for centering */
+    margin-bottom: 10px;
+    justify-content: center; /* Centers horizontally */
+
 }
 
 /* Rules */
@@ -244,7 +263,7 @@ label {
     border-radius: 15px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     position: relative;
-    top: -11px;
+    top: -60px;
 
     height: 379px;
     width: 550px;
@@ -255,6 +274,20 @@ label {
     margin-left: 10px;
 }
 
+
+
+
+.svgContainer{
+    
+    margin-bottom: -20px;
+}
+
+.logocontainer{
+    position: fixed;
+    display: fixed;
+    margin-left: 0px;
+    color: #fff;
+}
 
 
 /*

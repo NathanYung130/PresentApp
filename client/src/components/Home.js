@@ -171,9 +171,11 @@ const Home = ({ socket }) => {
 
     return (
         <>
-
-        <h1 className = "logo">Joe-Box</h1>
         <div className = "JoeBoxLogin">
+            <div className = "logocontainer">
+                <h1 className = "logo">Joe-Box</h1>
+            </div>
+            
             <form className="home__container">
                 <h2 className="home__header">Let's Play</h2>
                 <label htmlFor="username">Username</label>
@@ -226,6 +228,9 @@ const Home = ({ socket }) => {
                 <h1>Rules:</h1>
                 <RulesCarousel rules={rules} />
             </div>
+        </div>
+        <div className = "svgContainer">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="#ffffff" fill-opacity="1" d="M0,256L60,229.3C120,203,240,149,360,144C480,139,600,181,720,197.3C840,213,960,203,1080,197.3C1200,192,1320,192,1380,192L1440,192L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path></svg>
         </div>
         <div className = "backroundContainer">
             <div className = "ExtraInfo">

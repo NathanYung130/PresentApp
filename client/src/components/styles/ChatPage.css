@@ -1,5 +1,5 @@
 
-body {
+.GameScreenMessages {
     background: rgb(131,58,180);
     background: linear-gradient(333deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
     margin: 0; /* Add this to remove default margin */
@@ -44,8 +44,8 @@ button {
     left: 10%; /* adjust to desired position */
     transform: translate(-50%, -50%); /* center the div */
     z-index: 1; /* stack on top of other elements */
-    padding: 20px; /* add space around content */
     margin: 0; /* remove default margin */
+    
 }
 
 
@@ -142,7 +142,7 @@ button {
   }
 
   h1 {
-    margin-top: 10px;  /* Reduce top margin */
+    margin-top: 0px;  /* Reduce top margin */
     margin-bottom: 10px;  /* Reduce bottom margin */
   }
 
@@ -161,3 +161,8 @@ button {
     
         
 }
+
+  .window{
+    margin-top: 0px;
+    overflow: hidden;
+  }
