@@ -3,11 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { nanoid } from 'nanoid'
 import MoreInfo from './MoreInfo';
-
+import RulesCarousel from './RulesCarousel';
 import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice';
-
-
 import './styles/Home.css'
+//-----------------images-------------:
+import designerImage from './images/clip-quest.png';
+import Image2 from './images/raffle-nobg.png';
+import Image3 from './images/thinking-nobg.png';
+//------------------------------------:
+
 
 const Home = ({ socket }) => {
     //++++++++Declare Variables++++++++\\
@@ -122,6 +126,31 @@ const Home = ({ socket }) => {
         };
     }, []);
 
+    //-----------------rules--------------//
+    const rules = [
+        {
+            image: designerImage,
+            text: "First everyone is prompted to answer a unique question about themselves."
+        },
+        {
+            image: Image2,
+            text: "Next, one of those questions will be chosen."
+        },
+        {
+            image: Image3,
+            text: "If that question is yours, sit tight! If it is not, your task is to submit an answer you think that person would have submitted."
+        },
+        {
+            image: "/api/placeholder/400/300",
+            text: "Voting will begin! If you chose correctly, both you and question answerer will receive 15 pts."
+        },
+        {
+            image: "/api/placeholder/400/300",
+            text: "Wrong choices will give 10 pts to the one that deceived you! Remember this is a game of deception!"
+        },
+
+    ]
+
     
 // // ============ Logo Styling ===================\\
 // const logo = document.querySelector('.logo');
@@ -195,7 +224,7 @@ const Home = ({ socket }) => {
 
             <div className = "Rules">
                 <h1>Rules:</h1>
-
+                <RulesCarousel rules={rules} />
             </div>
         </div>
         <div className = "backroundContainer">

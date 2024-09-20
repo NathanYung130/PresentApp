@@ -89,12 +89,7 @@ label {
     gap: 10px;
 }
 
-@media (max-width: 600px) {
-    .home__container {
-        padding: 1.5rem;
-        width: 90%;
-    }
-}
+
 
 .alert {
     background-color: #ffdddd; /* Light pink background for a warning */
@@ -245,14 +240,14 @@ label {
 .Rules{
     color:rgba(0, 0, 0, 0.5);
     background-color: #fff;
-    padding: 50px;
+    padding: 10px;
     border-radius: 15px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     position: relative;
     top: -11px;
 
-    height: 300px;
-    width: 400px;
+    height: 379px;
+    width: 550px;
     /* height: auto;
     width: auto; */
     max-width: 600px;
@@ -279,3 +274,45 @@ label {
 // });
 
 */
+
+
+@media (max-width: 768px) {
+    .home__container {
+        padding: 1.5rem;
+        width: 50vh;
+    }
+    .JoeBoxLogin{
+        display: flex;
+        height: 150vh;
+        
+        flex-direction: column;
+        justify-items: center; /* Centers items horizontally */
+        align-items: center; /* Centers items vertically */
+        justify-content: center;
+    }
+    .Rules{
+        color:rgba(0, 0, 0, 0.5);
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 15px;
+        position: relative;
+        height: 379px;
+        width: 54vh;
+        /* height: auto;
+        width: auto; */
+        max-width: 600px;
+        display: absolute;
+        margin-left: 10px;
+        padding-bottom: 5vh;
+    }
+
+    .ExtraInfo{
+        background-color: #fff;
+        display: absolute;
+        max-width: 900px; /* adjust the value as needed */
+        color:rgba(0, 0, 0, 0.5);
+        margin-left: 5vh;
+    }
+    
+        
+}
