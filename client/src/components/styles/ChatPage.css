@@ -37,17 +37,24 @@ button {
   }
 
 .logo{
-    /* margin: 0;
-    padding: 0; */
+
     position: fixed; /* or absolute */
-    top: 3%; /* adjust to desired position */
-    left: 10%; /* adjust to desired position */
-    transform: translate(-50%, -50%); /* center the div */
-    z-index: 1; /* stack on top of other elements */
-    margin: 0; /* remove default margin */
+    top: 0%; /* adjust to desired position */
+    left: 0%; /* adjust to desired position */
+    z-index: 0; /* stack on top of other elements */
+    color: #fff;
+    margin-top: 10px;
+    margin-left: 20px;
     
 }
 
+.logo :hover{
+  cursor: pointer;
+}
+
+.hover :hover{
+  cursor: pointer;
+}
 
 .gameDisp {
     width: 90vw;
@@ -83,20 +90,19 @@ button {
 }
 
 .chat__main{
-    position: fixed;
-    bottom: 20px;
-    right: 20px; 
+    position: absolute;
+    bottom: 30px;
+    right: 60px; 
     width: 300px; 
     max-height: 150px;
-    background-color: #fff; 
+ 
     border-radius: 10px; 
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); 
     overflow-y: auto;
     z-index: 1000; 
     padding: 10px;
     display: flex;
     flex-direction: column; 
-    margin-bottom: 30px;
+    padding-bottom: 90px;
 }
 
 
@@ -166,3 +172,4 @@ button {
     margin-top: 0px;
     overflow: hidden;
   }
+  

@@ -26,7 +26,7 @@ const RulesCarousel = ({ rules }) => {
         </button>
       </div>
       <div className="carousel-text">
-        <p>{rules[currentIndex].text}</p>
+        <p className="ruleText">{rules[currentIndex].text}</p>
       </div>
       <div className="carousel-indicators">
         {rules.map((_, index) => (
