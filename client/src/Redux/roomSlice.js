@@ -1,9 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, miniSerializeError } from '@reduxjs/toolkit';
 
 const initialState = {
   userName: null,
   roomId: null,
   socketId: null,
+  currUsers: 0,
 };
 
 const roomSlice = createSlice({
@@ -19,8 +20,11 @@ const roomSlice = createSlice({
     setSocketId: (state, action) => {
       return { ...state, socketId: action.payload };
     },
+    setCurrUsers: (state, action) => {
+      state.currUsers = action.payload;
+    },
   },
 });
 
-export const { setUser, setRoomId, setSocketId } = roomSlice.actions;
+export const { setUser, setRoomId, setSocketId, setCurrUsers } = roomSlice.actions;
 export default roomSlice.reducer;

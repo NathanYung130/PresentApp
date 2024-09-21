@@ -56,6 +56,13 @@ button {
   cursor: pointer;
 }
 
+.hoverDiv{
+  cursor: pointer;
+  width: 300px;
+  height: 70px;
+
+}
+
 .gameDisp {
     width: 90vw;
     height: 80vh;
@@ -157,4 +164,25 @@ button {
     margin-top: 0px;
     overflow: hidden;
   }
-  
+
+.optionalRoomCode{
+  display: none;
+}
+
+@media (max-width: 768px){
+
+  .optionalRoomCode{
+     display: block;
+
+    
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 100000;
+    background-color: #3d3d3d;
+    padding: 12px;
+    font-size: 8px;
+    border-radius: 5px;
+    text-align: center;
+  }
+}

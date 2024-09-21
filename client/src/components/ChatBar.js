@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setUser, setRoomId, setSocketId} from '../Redux/roomSlice'
-
+import { setCurrUsers } from '../Redux/roomSlice';
 import { nanoid } from 'nanoid';
 
 import './styles/ChatBar.css'
@@ -15,7 +15,13 @@ const ChatBar = ({ socket }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    socket.on('newUserResponse', (data) => setUsers(data));
+    // socket.on('newUserResponse', (data) => setUsers(data));
+    
+    socket.on('newUserResponse', (data) => {
+      setUsers(data);
+      dispatch(setCurrUsers(data.length)); // Dispatch the number of users
+    });
+
     return () => {
       socket.off('newUserResponse');
     };
