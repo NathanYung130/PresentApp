@@ -152,21 +152,6 @@ button {
     margin-bottom: 10px;  /* Reduce bottom margin */
   }
 
-  @media (max-width: 768px) {
-    .logo {
-      align-content: center;
-    position: absolute; /* or absolute */
-    top: 3%; /* adjust to desired position */
-    left: 40%; /* adjust to desired position */
-    transform: translate(-50%, -50%); /* center the div */
-    z-index: 1; /* stack on top of other elements */
-    padding: 20px; /* add space around content */
-    margin: 0; /* remove default margin */
-
-    }
-    
-        
-}
 
   .window{
     margin-top: 0px;

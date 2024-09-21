@@ -282,42 +282,62 @@ label {
 
 
 @media (max-width: 768px) {
+
     .home__container {
-        padding: 1.5rem;
+        /* padding: 1.5rem;
+        width: 50vh; */
+        height: 40vh;
         width: 50vh;
     }
     .JoeBoxLogin{
         display: flex;
-        height: 150vh;
-        
+        height: 160vh;
+        margin:0px;
         flex-direction: column;
         justify-items: center; /* Centers items horizontally */
         align-items: center; /* Centers items vertically */
         justify-content: center;
+        width:100vh;
     }
     .Rules{
+        margin-top:10vh;
         color:rgba(0, 0, 0, 0.5);
         background-color: #fff;
         padding: 10px;
         border-radius: 15px;
         position: relative;
-        height: 379px;
-        width: 54vh;
+        height: 60vh;
+        width: 60vh;
         /* height: auto;
         width: auto; */
         max-width: 600px;
         display: absolute;
         margin-left: 10px;
-        padding-bottom: 5vh;
+        padding-bottom: 2vh;
     }
 
     .ExtraInfo{
-        background-color: #fff;
-        display: absolute;
-        max-width: 900px; /* adjust the value as needed */
-        color:rgba(0, 0, 0, 0.5);
-        margin-left: 5vh;
+        text-align:center;
+        display:block;
+        text-wrap: wrap;
+        background-color: #f0f4f8;
+        color: rgba(0, 0, 0, 0.5);
+        margin-bottom: 20px;
+        font-size: 18px;
+
+
+    }
+    .svgContainer{
+        z-index:-10;
+        margin-bottom: -20px;
     }
     
+    .backroundContainer{
+        display: block;
+        background-color: #f0f4f8;
+        min-height: 100vh; /* Full viewport height for centering */
+        
+    }
+
         
 }

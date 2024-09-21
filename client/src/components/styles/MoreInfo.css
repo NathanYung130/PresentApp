@@ -1,5 +1,5 @@
 .moreInfoDiv{
-    margin-bottom: 0px;
+
 }
 
 .img1{
@@ -70,4 +70,12 @@
 .NodeLogo{
     height: 110px;
     width: 180px;
+}
+
+@media (max-width: 768px) {
+    .moreInfoDiv{
+        display:inline-block;
+    }
+
+
 }
