@@ -1,14 +1,16 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    /* background-color: #f0f4f8; */
+    background-color: #f0f4f8;
     display: absolute;
     align-items: center;
     height: 100vh;
     margin: 0;
+    color: #fff;
 }
 
 .home__container {
+
     display: absolute;
     background: #ffffff;
     padding: 50px;
@@ -22,7 +24,9 @@ body {
     margin-top: -100px;
     /* margin-top: 100px;
     margin-left: 50px; */
+    
 }
+
 
 .logo.light {
     filter: invert(1); /* change logo to black (invert white) */
@@ -36,6 +40,7 @@ body {
     margin-bottom: 1.5rem;
     font-weight: bold;
     letter-spacing: 1px;
+    color:rgba(0, 0, 0, 0.5);
 }
 
 label {
@@ -222,37 +227,31 @@ label {
     justify-items: center; /* Centers items horizontally */
     align-items: center; /* Centers items vertically */
     justify-content: center;
-    margin-bottom: -250px;
+    margin-bottom: -260px;
 
     background: rgb(131,58,180);
     background: linear-gradient(333deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
 }
 
 .ExtraInfo{
-    background-color: #fff;
-    display: absolute;
+    background-color: #f0f4f8;
+    display: flex;
     max-width: 900px; /* adjust the value as needed */
     color:rgba(0, 0, 0, 0.5);
     margin-left: 0;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     letter-spacing: 1px;
     font-size: 18px;
+    height: auto;
 }
 
 .backroundContainer{
-    /* display: flex;
-    position: absolute;
-    background-color: #fff;
-    margin-bottom: 0;
-    justify-content: center;
-    align-items: center; */
-
     display: flex;
-    background-color: #fff;
-    height: 100vh; /* Full viewport height for centering */
-    margin-bottom: 10px;
+    background-color: #f0f4f8;
+    min-height: 100vh; /* Full viewport height for centering */
+    margin-bottom: 50px;
     justify-content: center; /* Centers horizontally */
-
+    padding-bottom: 50px;
 }
 
 /* Rules */
@@ -272,41 +271,14 @@ label {
     max-width: 600px;
     display: absolute;
     margin-left: 10px;
+    text-align: center;
 }
-
-
 
 
 .svgContainer{
-    
+
     margin-bottom: -20px;
 }
-
-.logocontainer{
-    position: fixed;
-    display: fixed;
-    margin-left: 0px;
-    color: #fff;
-}
-
-
-/*
-// // ============ Logo Styling ===================\\
-// const logo = document.querySelector('.logo');
-
-// // Define the scroll threshold (adjust as needed)
-// const threshold = 200; // pixels
-
-// // Add event listener for scroll
-// window.addEventListener('scroll', () => {
-//   if (window.scrollY > threshold) {
-//     logo.classList.add('light');
-//   } else {
-//     logo.classList.remove('light');
-//   }
-// });
-
-*/
 
 
 @media (max-width: 768px) {

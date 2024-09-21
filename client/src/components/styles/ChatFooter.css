@@ -11,8 +11,9 @@
 }
 
 .form {
-    display: flex;
-    width: 100%;
+    display: fixed;
+    width: 500%;
+    padding-left: 30px;
 }
 
 .message {

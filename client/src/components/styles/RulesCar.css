@@ -26,10 +26,10 @@
   }
   
   .carousel-inner img {
-    width: 40%;
-    height: 50%;
-    padding-left: 21vh;
-
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   }
   
   .carousel-text {
@@ -40,6 +40,7 @@
     margin-bottom: 15px;
     min-height: 5vh;
     max-height: 5vh;
+    color:rgba(0, 0, 0, 0.5);
   }
   
   .carousel-text p {
@@ -47,6 +48,7 @@
     color: #333;
     text-align: center;
     margin: 0;
+    font-family: 'Poppins', sans-serif;
     
   }
   
@@ -82,7 +84,7 @@
   .carousel-indicators {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    margin-top: -15px;
   }
   
   .carousel-indicator {
@@ -97,7 +99,7 @@
     background-color: #337ab7;
   }
 
-  
+
 @media (max-width: 918px) {
     
     .carousel-text {
