@@ -185,4 +185,24 @@ button {
     border-radius: 5px;
     text-align: center;
   }
+
+  .fbbage-titler{
+    display: none;
+  }
+
+  .startPrompt{
+    margin-top: 2vh;
+    font-size: 15px;
+  }
+
+  .rules-titleCard{
+    font-size: 10px;
+    margin-top: 0px;
+  }
+
+  .GameScreenMessages{
+    margin-top: 2vh;
+    width: 100%;
+    height: 100%;
+  }
 }

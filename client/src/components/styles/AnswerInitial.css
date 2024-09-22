@@ -28,3 +28,13 @@
     left: 50%;
     transform: translate(-50%, -30%);
   }
+
+  @media (max-width: 768px){
+    .initial_question_input{
+      margin-bottom: 0;
+      margin-top: 6vh;;
+      width: 50%;
+      height: 2%;
+    }
+
+  }   
