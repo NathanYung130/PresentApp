@@ -80,7 +80,6 @@ const ChatPage = ({ socket }) => {
         setNewMessage('');
     };
 
-    document.body.style.overflow = 'hidden';
 
     return (
         <>
@@ -89,7 +88,7 @@ const ChatPage = ({ socket }) => {
                     <h1 className="" onClick = {handleLogo}>Joe-Box</h1>
                 </div>
                 <div className="optionalRoomCode">
-                    <h1>{rmUsers}</h1>
+                    <h2>Users: {rmUsers}</h2>
                     <h1>{roomCode}</h1>
                 </div>
             <div className = "window">

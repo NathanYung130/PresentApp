@@ -97,7 +97,6 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
           />
           <div className="progress-circle-container">
           <CountProgressBar duration={20000} onComplete={timerHandler} />
-
           </div>
         </label>
         {!submit && (
@@ -105,7 +104,6 @@ const AnswerInitialQuestion = ({ question, userName, roomID, socket }) => {
         )}
       </form>
       
-    {/* <h2>{clicks}/{numMembers} Submitted</h2> */}
     </div>
   );
 };

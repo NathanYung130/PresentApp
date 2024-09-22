@@ -5,24 +5,6 @@ function ProgressBar({ duration, onComplete }) {
     const intervalRef = useRef(null);
     const hasCompletedRef = useRef(false);
 
-
-    // useEffect(() => {
-    //     const intervalTime = 200;
-    //     const increment = 100 / (duration / intervalTime);
-    //     const interval = setInterval(() => {
-    //         setProgress((prev) => {
-    //             if (prev + increment >= 100) {
-    //                 clearInterval(interval);
-    //                 onComplete(); // Notify that countdown is finished
-    //                 return 100;
-    //             }
-    //             return prev + increment;
-    //         });
-    //     }, intervalTime);
-
-    //     return () => clearInterval(interval);
-    // }, [duration, onComplete]);
-
     useEffect(() => {
         const intervalTime = 200;
         const increment = 100 / (duration / intervalTime);

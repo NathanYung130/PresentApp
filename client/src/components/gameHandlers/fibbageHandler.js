@@ -44,7 +44,7 @@ const FibbageHandler = ({ socket }) => {
     
             if (adminBoolError){
                 console.log('Error fetching admin status');
-                // dispatch(setGameAdmin(adminBool[0].username));
+
             }else {
                 console.log('Admin = ', adminBool[0].username);
                 if (adminBool[0].username === userName){
@@ -106,15 +106,7 @@ const FibbageHandler = ({ socket }) => {
 
     return (
         <>
-            {/* <h1>Fibbage!</h1> */}
             {renderGameComponent()}
-            {/* <h2>Current Game State: {gameState}</h2>
-            {!gameEnded && <button onClick={ handleNextState }>Next State</button>} */}
-            {/* {gameEnded && <p>Game has ended!</p>}
-
-            {sittingOutPlayer && <p>Sitting Out Player: {sittingOutPlayer}</p>}
-            {gameEnded && <p>Game has ended!</p>} */}
-
         </>
     );
 };

@@ -222,7 +222,8 @@ label {
 .JoeBoxLogin{
     display: flex;
     height: 100vh;
-    
+    width: 100vw;
+
     flex-direction: row;
     justify-items: center; /* Centers items horizontally */
     align-items: center; /* Centers items vertically */
@@ -338,6 +339,4 @@ label {
         min-height: 100vh; /* Full viewport height for centering */
         
     }
-
-        
 }

@@ -53,8 +53,8 @@ const GameLobby = ({ socket }) => {
     return(
         <> 
         <div className = "gameStartPage">
-            <h2> Welcome to Fibbage All About You! </h2>
-            <h1> Hit start when all members are here! </h1>
+            <h2 className = "fbbage-titler"> Welcome to Fibbage All About You! </h2>
+            <h1 className = "startPrompt"> Hit start when all members are here! </h1>
             <button className="gameStart_btn" onClick={handleGameStart}>START GAME</button>
             <div className = "rules">
             <h2 className ="rules-titleCard">Here's how the game will work: </h2>
